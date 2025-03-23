@@ -1,7 +1,7 @@
 
 import { useState, useEffect } from "react";
 import Layout from "@/components/layout/Layout";
-import { UserRole, Order } from "@/lib/types";
+import { UserRole, Order, SearchType } from "@/lib/types";
 import {
   Card,
   CardContent,
@@ -13,13 +13,27 @@ import {
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Label } from "@/components/ui/label";
-import { Search, CheckCircle, PackageCheck, Truck, ArrowUpDown } from "lucide-react";
+import { 
+  Search, 
+  CheckCircle, 
+  PackageCheck, 
+  Truck, 
+  ArrowUpDown 
+} from "lucide-react";
+import {
+  Select,
+  SelectContent,
+  SelectItem,
+  SelectTrigger,
+  SelectValue,
+} from "@/components/ui/select";
 
 const DeliveryPage = () => {
   const [userRole, setUserRole] = useState<UserRole>("user");
   const [projectName, setProjectName] = useState("Food Delivery");
   const [orders, setOrders] = useState<Order[]>([]);
-  const [houseNumberQuery, setHouseNumberQuery] = useState("");
+  const [searchQuery, setSearchQuery] = useState("");
+  const [searchType, setSearchType] = useState<SearchType>("houseNumber");
   const [currentOrder, setCurrentOrder] = useState<Order | null>(null);
   const [isSearching, setIsSearching] = useState(false);
   const [deliveryFilter, setDeliveryFilter] = useState<"all" | "pending" | "delivered">("pending");
@@ -28,6 +42,7 @@ const DeliveryPage = () => {
   useEffect(() => {
     const storedRole = localStorage.getItem("user_role") as UserRole | null;
     const storedName = localStorage.getItem("project_name");
+    const selectedProject = localStorage.getItem("selected_project");
     
     if (storedRole) {
       setUserRole(storedRole);
@@ -47,7 +62,7 @@ const DeliveryPage = () => {
       numberOfPeople: Math.floor(Math.random() * 5) + 1,
       amount: Math.floor(Math.random() * 5000) + 1000,
       status: i % 3 === 0 ? "delivered" : "pending",
-      projectId: "project-1",
+      projectId: selectedProject ? JSON.parse(selectedProject).project.id : "project-1",
       createdAt: new Date(2023, 7, 20 - i).toISOString(),
       updatedAt: new Date(2023, 7, 20 - i).toISOString(),
     }));
@@ -56,16 +71,35 @@ const DeliveryPage = () => {
   }, []);
   
   const handleSearch = () => {
-    if (!houseNumberQuery) return;
+    if (!searchQuery) return;
     
     setIsSearching(true);
     setCurrentOrder(null);
     
     // Simulate API call delay
     setTimeout(() => {
-      const foundOrder = orders.find(
-        (order) => order.houseNumber.toLowerCase() === houseNumberQuery.toLowerCase()
-      );
+      let foundOrder: Order | undefined;
+      
+      // Search based on the selected search type
+      switch (searchType) {
+        case "serialNumber":
+          foundOrder = orders.find(
+            (order) => order.serialNumber.toLowerCase() === searchQuery.toLowerCase()
+          );
+          break;
+        case "name":
+          // Using includes for fuzzy name matching
+          foundOrder = orders.find(
+            (order) => order.name.toLowerCase().includes(searchQuery.toLowerCase())
+          );
+          break;
+        case "houseNumber":
+        default:
+          foundOrder = orders.find(
+            (order) => order.houseNumber.toLowerCase() === searchQuery.toLowerCase()
+          );
+          break;
+      }
       
       setCurrentOrder(foundOrder || null);
       setIsSearching(false);
@@ -99,6 +133,26 @@ const DeliveryPage = () => {
   const pendingPeople = orders
     .filter((order) => order.status === "pending")
     .reduce((acc, order) => acc + order.numberOfPeople, 0);
+
+  // Search type options
+  const searchTypeOptions = [
+    { value: "serialNumber", label: "Serial Number" },
+    { value: "name", label: "Customer Name" },
+    { value: "houseNumber", label: "House Number" }
+  ];
+
+  // Get placeholder text based on search type
+  const getPlaceholderText = () => {
+    switch (searchType) {
+      case "serialNumber":
+        return "Enter Serial Number (e.g., SN-1001)";
+      case "name":
+        return "Enter Customer Name";
+      case "houseNumber":
+      default:
+        return "Enter House Number (e.g., H-101)";
+    }
+  };
 
   return (
     <Layout role={userRole} projectName={projectName}>
@@ -163,21 +217,40 @@ const DeliveryPage = () => {
             <CardHeader>
               <CardTitle>Update Delivery Status</CardTitle>
               <CardDescription>
-                Enter a house number to find and update an order's delivery status
+                Search for an order by Serial Number, Customer Name, or House Number
               </CardDescription>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
+                <div className="flex flex-col space-y-2">
+                  <Label htmlFor="search-type">Search by</Label>
+                  <Select 
+                    value={searchType} 
+                    onValueChange={(value) => setSearchType(value as SearchType)}
+                  >
+                    <SelectTrigger id="search-type" className="w-full">
+                      <SelectValue placeholder="Select search type" />
+                    </SelectTrigger>
+                    <SelectContent>
+                      {searchTypeOptions.map(option => (
+                        <SelectItem key={option.value} value={option.value}>
+                          {option.label}
+                        </SelectItem>
+                      ))}
+                    </SelectContent>
+                  </Select>
+                </div>
+                
                 <div className="flex space-x-2">
                   <div className="flex-1">
                     <Input
-                      placeholder="Enter House Number (e.g., H-101)"
-                      value={houseNumberQuery}
-                      onChange={(e) => setHouseNumberQuery(e.target.value)}
+                      placeholder={getPlaceholderText()}
+                      value={searchQuery}
+                      onChange={(e) => setSearchQuery(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleSearch()}
                     />
                   </div>
-                  <Button onClick={handleSearch} disabled={isSearching || !houseNumberQuery}>
+                  <Button onClick={handleSearch} disabled={isSearching || !searchQuery}>
                     {isSearching ? (
                       <span className="h-4 w-4 rounded-full border-2 border-current border-r-transparent animate-spin mr-2" />
                     ) : (
@@ -252,9 +325,10 @@ const DeliveryPage = () => {
                   <div className="flex items-center justify-center py-8">
                     <div className="h-8 w-8 rounded-full border-4 border-primary border-t-transparent animate-spin"></div>
                   </div>
-                ) : houseNumberQuery !== "" ? (
+                ) : searchQuery !== "" ? (
                   <div className="text-center py-8 text-muted-foreground">
-                    No orders found with house number "{houseNumberQuery}"
+                    No orders found with {searchType === "serialNumber" ? "serial number" : 
+                      searchType === "name" ? "customer name" : "house number"} "{searchQuery}"
                   </div>
                 ) : null}
               </div>
@@ -304,7 +378,11 @@ const DeliveryPage = () => {
                           }`}
                           onClick={() => {
                             setCurrentOrder(order);
-                            setHouseNumberQuery(order.houseNumber);
+                            setSearchQuery(
+                              searchType === "serialNumber" ? order.serialNumber : 
+                              searchType === "name" ? order.name : 
+                              order.houseNumber
+                            );
                           }}
                         >
                           <td className="px-4 py-2 font-medium">{order.houseNumber}</td>

@@ -5,7 +5,7 @@ export interface User {
   id: string;
   email: string;
   role: UserRole;
-  projectId?: string;
+  projectIds?: string[]; // Changed from single projectId to multiple projectIds
 }
 
 export interface Project {
@@ -15,6 +15,11 @@ export interface Project {
   ownerId: string;
   createdAt: string;
   lastActive: string;
+  apiKey?: string; // Added for Supabase integration
+  dbKey?: string; // Added for Supabase integration
+  totalOrders?: number;
+  pendingDeliveries?: number;
+  balance?: number;
 }
 
 export interface Order {
@@ -54,3 +59,16 @@ export interface DeliveryStats {
   totalPeople: number;
   pendingPeople: number;
 }
+
+export interface ProjectSummary {
+  project: Project;
+  stats: {
+    totalOrders: number;
+    pendingDeliveries: number;
+    totalIncome: number;
+    totalExpenditure: number;
+    balance: number;
+  };
+}
+
+export type SearchType = "serialNumber" | "name" | "houseNumber";

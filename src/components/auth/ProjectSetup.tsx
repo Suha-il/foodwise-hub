@@ -11,17 +11,21 @@ import {
 } from "@/components/ui/card";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { ArrowLeft, Copy } from "lucide-react";
+import { ArrowLeft, Copy, Eye, EyeOff } from "lucide-react";
 
 interface ProjectSetupProps {
   onBack: () => void;
-  onComplete: (projectName: string, projectCode: string) => void;
+  onComplete: (projectName: string, projectCode: string, apiKey?: string, dbKey?: string) => void;
 }
 
 export default function ProjectSetup({ onBack, onComplete }: ProjectSetupProps) {
   const [projectName, setProjectName] = useState("");
   const [isGenerating, setIsGenerating] = useState(false);
   const [projectCode, setProjectCode] = useState("");
+  const [apiKey, setApiKey] = useState("");
+  const [dbKey, setDbKey] = useState("");
+  const [showApiKey, setShowApiKey] = useState(false);
+  const [showDbKey, setShowDbKey] = useState(false);
 
   const generateUniqueCode = () => {
     setIsGenerating(true);
@@ -51,9 +55,12 @@ export default function ProjectSetup({ onBack, onComplete }: ProjectSetupProps) 
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (projectName && projectCode) {
-      onComplete(projectName, projectCode);
+      onComplete(projectName, projectCode, apiKey, dbKey);
     }
   };
+
+  const toggleShowApiKey = () => setShowApiKey(!showApiKey);
+  const toggleShowDbKey = () => setShowDbKey(!showDbKey);
 
   return (
     <div className="mx-auto max-w-md">
@@ -128,6 +135,62 @@ export default function ProjectSetup({ onBack, onComplete }: ProjectSetupProps) 
                 </div>
                 <p className="text-xs text-muted-foreground">
                   Share this code with your team members so they can join your project
+                </p>
+              </div>
+              
+              <div className="grid gap-3">
+                <Label htmlFor="supabase-api-key">Supabase API Key (Optional)</Label>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <Input
+                      id="supabase-api-key"
+                      type={showApiKey ? "text" : "password"}
+                      placeholder="Enter your Supabase API key"
+                      value={apiKey}
+                      onChange={(e) => setApiKey(e.target.value)}
+                      className="input-animated font-mono pr-10"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-0 top-0 h-full"
+                      onClick={toggleShowApiKey}
+                    >
+                      {showApiKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </Button>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Your API key will be securely stored and used only for this project
+                </p>
+              </div>
+              
+              <div className="grid gap-3">
+                <Label htmlFor="supabase-db-key">Supabase Database Key (Optional)</Label>
+                <div className="flex gap-2">
+                  <div className="relative flex-1">
+                    <Input
+                      id="supabase-db-key"
+                      type={showDbKey ? "text" : "password"}
+                      placeholder="Enter your Supabase Database key"
+                      value={dbKey}
+                      onChange={(e) => setDbKey(e.target.value)}
+                      className="input-animated font-mono pr-10"
+                    />
+                    <Button
+                      type="button"
+                      variant="ghost"
+                      size="icon"
+                      className="absolute right-0 top-0 h-full"
+                      onClick={toggleShowDbKey}
+                    >
+                      {showDbKey ? <EyeOff className="h-4 w-4" /> : <Eye className="h-4 w-4" />}
+                    </Button>
+                  </div>
+                </div>
+                <p className="text-xs text-muted-foreground">
+                  Your Database key will be securely stored and used only for this project
                 </p>
               </div>
             </div>

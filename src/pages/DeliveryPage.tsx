@@ -111,7 +111,7 @@ const DeliveryPage = () => {
     
     // In a real app, this would call an API
     const updatedOrders = orders.map((order) =>
-      order.id === currentOrder.id ? { ...order, status: "delivered", updatedAt: new Date().toISOString() } : order
+      order.id === currentOrder.id ? { ...order, status: "delivered" as const, updatedAt: new Date().toISOString() } : order
     );
     
     setOrders(updatedOrders);

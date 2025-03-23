@@ -38,7 +38,7 @@ const queryClient = new QueryClient({
     queries: {
       staleTime: 5 * 60 * 1000, // 5 minutes
       refetchOnWindowFocus: false,
-      suspense: false, // We'll handle loading states manually for more control
+      // Removing the suspense property as it doesn't exist in the current version
     },
   },
 });

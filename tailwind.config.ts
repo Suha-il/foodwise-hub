@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -75,20 +74,12 @@ export default {
 			},
 			keyframes: {
 				'accordion-down': {
-					from: {
-						height: '0'
-					},
-					to: {
-						height: 'var(--radix-accordion-content-height)'
-					}
+					from: { height: '0' },
+					to: { height: 'var(--radix-accordion-content-height)' }
 				},
 				'accordion-up': {
-					from: {
-						height: 'var(--radix-accordion-content-height)'
-					},
-					to: {
-						height: '0'
-					}
+					from: { height: 'var(--radix-accordion-content-height)' },
+					to: { height: '0' }
 				},
 				'fade-in': {
 					'0%': { opacity: '0' },
@@ -121,6 +112,9 @@ export default {
 				pulse: {
 					'0%, 100%': { opacity: '1' },
 					'50%': { opacity: '0.5' }
+				},
+				shimmer: {
+					'100%': { transform: 'translateX(100%)' }
 				}
 			},
 			animation: {
@@ -133,18 +127,22 @@ export default {
 				'slide-in-right': 'slide-in-right 0.3s ease-out',
 				'slide-in-left': 'slide-in-left 0.3s ease-out',
 				'float': 'float 3s ease-in-out infinite',
-				'pulse': 'pulse 2s ease-in-out infinite'
+				'pulse': 'pulse 2s ease-in-out infinite',
+				'shimmer': 'shimmer 2s infinite linear'
 			},
 			boxShadow: {
 				'glass': '0 4px 30px rgba(0, 0, 0, 0.1)',
 				'glass-strong': '0 8px 32px rgba(0, 0, 0, 0.1)',
 				'neo': '5px 5px 10px #d1d1d1, -5px -5px 10px #ffffff',
 				'inner-neo': 'inset 3px 3px 6px #d1d1d1, inset -3px -3px 6px #ffffff',
+				'highlight': '0 0 15px rgba(59, 130, 246, 0.5)',
+				'card-hover': '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)'
 			},
 			backgroundImage: {
 				'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
 				'glass': 'linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.2))',
 				'glass-dark': 'linear-gradient(135deg, rgba(40, 40, 40, 0.4), rgba(20, 20, 20, 0.2))',
+				'gradient-shimmer': 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent)'
 			}
 		}
 	},

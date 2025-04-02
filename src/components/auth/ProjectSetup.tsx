@@ -1,4 +1,5 @@
 
+import { useIsMobile } from "@/hooks/use-mobile";
 import ProjectSetupForm from "./ProjectSetupForm";
 
 interface ProjectSetupProps {
@@ -7,5 +8,11 @@ interface ProjectSetupProps {
 }
 
 export default function ProjectSetup({ onBack, onComplete }: ProjectSetupProps) {
-  return <ProjectSetupForm onBack={onBack} onComplete={onComplete} />;
+  const isMobile = useIsMobile();
+  
+  return (
+    <div className={isMobile ? "px-4" : ""}>
+      <ProjectSetupForm onBack={onBack} onComplete={onComplete} />
+    </div>
+  );
 }

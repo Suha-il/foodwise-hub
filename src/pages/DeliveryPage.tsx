@@ -1,4 +1,3 @@
-
 import { useState, useEffect } from "react";
 import Layout from "@/components/layout/Layout";
 import { UserRole, Order, SearchType } from "@/lib/types";
@@ -27,6 +26,7 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 const DeliveryPage = () => {
   const [userRole, setUserRole] = useState<UserRole>("user");
@@ -37,8 +37,8 @@ const DeliveryPage = () => {
   const [currentOrder, setCurrentOrder] = useState<Order | null>(null);
   const [isSearching, setIsSearching] = useState(false);
   const [deliveryFilter, setDeliveryFilter] = useState<"all" | "pending" | "delivered">("pending");
+  const isMobile = useIsMobile();
   
-  // In a real app, fetch this from localStorage or a state management solution
   useEffect(() => {
     const storedRole = localStorage.getItem("user_role") as UserRole | null;
     const storedName = localStorage.getItem("project_name");
@@ -52,7 +52,6 @@ const DeliveryPage = () => {
       setProjectName(storedName);
     }
     
-    // Mock data for demonstration
     const mockOrders: Order[] = Array.from({ length: 20 }, (_, i) => ({
       id: `order-${i + 1}`,
       serialNumber: `SN-${1000 + i}`,
@@ -76,11 +75,9 @@ const DeliveryPage = () => {
     setIsSearching(true);
     setCurrentOrder(null);
     
-    // Simulate API call delay
     setTimeout(() => {
       let foundOrder: Order | undefined;
       
-      // Search based on the selected search type
       switch (searchType) {
         case "serialNumber":
           foundOrder = orders.find(
@@ -88,7 +85,6 @@ const DeliveryPage = () => {
           );
           break;
         case "name":
-          // Using includes for fuzzy name matching
           foundOrder = orders.find(
             (order) => order.name.toLowerCase().includes(searchQuery.toLowerCase())
           );
@@ -109,14 +105,12 @@ const DeliveryPage = () => {
   const handleMarkDelivered = () => {
     if (!currentOrder) return;
     
-    // In a real app, this would call an API
     const updatedOrders = orders.map((order) =>
       order.id === currentOrder.id ? { ...order, status: "delivered" as const, updatedAt: new Date().toISOString() } : order
     );
     
     setOrders(updatedOrders);
     
-    // Update the current order in the state
     setCurrentOrder({ ...currentOrder, status: "delivered", updatedAt: new Date().toISOString() });
   };
   
@@ -125,23 +119,19 @@ const DeliveryPage = () => {
     return order.status === deliveryFilter;
   });
   
-  // Calculate pending and delivered counts
   const pendingCount = orders.filter((order) => order.status === "pending").length;
   const deliveredCount = orders.filter((order) => order.status === "delivered").length;
   
-  // Calculate total people pending delivery
   const pendingPeople = orders
     .filter((order) => order.status === "pending")
     .reduce((acc, order) => acc + order.numberOfPeople, 0);
 
-  // Search type options
   const searchTypeOptions = [
     { value: "serialNumber", label: "Serial Number" },
     { value: "name", label: "Customer Name" },
     { value: "houseNumber", label: "House Number" }
   ];
 
-  // Get placeholder text based on search type
   const getPlaceholderText = () => {
     switch (searchType) {
       case "serialNumber":
@@ -156,79 +146,79 @@ const DeliveryPage = () => {
 
   return (
     <Layout role={userRole} projectName={projectName}>
-      <div className="space-y-6">
+      <div className="space-y-4 md:space-y-6">
         <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold tracking-tight">Delivery Status</h1>
+          <h1 className="text-xl md:text-2xl lg:text-3xl font-bold tracking-tight">Delivery Status</h1>
         </div>
         
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+        <div className="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-3 md:gap-4">
           <Card className="bg-white">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl flex items-center">
-                <PackageCheck className="mr-2 h-5 w-5 text-amber-500" />
+            <CardHeader className="pb-2 px-4 py-3 md:px-6 md:py-4">
+              <CardTitle className="text-base md:text-xl flex items-center">
+                <PackageCheck className="mr-2 h-4 w-4 md:h-5 md:w-5 text-amber-500" />
                 Pending Orders
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">{pendingCount}</div>
-              <p className="text-muted-foreground">
+            <CardContent className="px-4 pb-4 md:px-6">
+              <div className="text-2xl md:text-3xl font-bold">{pendingCount}</div>
+              <p className="text-sm md:text-base text-muted-foreground">
                 {pendingPeople} people waiting
               </p>
             </CardContent>
           </Card>
           
           <Card className="bg-white">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl flex items-center">
-                <CheckCircle className="mr-2 h-5 w-5 text-green-500" />
+            <CardHeader className="pb-2 px-4 py-3 md:px-6 md:py-4">
+              <CardTitle className="text-base md:text-xl flex items-center">
+                <CheckCircle className="mr-2 h-4 w-4 md:h-5 md:w-5 text-green-500" />
                 Delivered Orders
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">{deliveredCount}</div>
-              <p className="text-muted-foreground">
+            <CardContent className="px-4 pb-4 md:px-6">
+              <div className="text-2xl md:text-3xl font-bold">{deliveredCount}</div>
+              <p className="text-sm md:text-base text-muted-foreground">
                 {(deliveredCount / (pendingCount + deliveredCount) * 100).toFixed(0)}% completion rate
               </p>
             </CardContent>
           </Card>
           
-          <Card className="bg-white">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl flex items-center">
-                <Truck className="mr-2 h-5 w-5 text-primary" />
+          <Card className="bg-white sm:col-span-2 md:col-span-1">
+            <CardHeader className="pb-2 px-4 py-3 md:px-6 md:py-4">
+              <CardTitle className="text-base md:text-xl flex items-center">
+                <Truck className="mr-2 h-4 w-4 md:h-5 md:w-5 text-primary" />
                 Today's Deliveries
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">
+            <CardContent className="px-4 pb-4 md:px-6">
+              <div className="text-2xl md:text-3xl font-bold">
                 {orders.filter(
                   (order) => 
                     order.status === "delivered" && 
                     new Date(order.updatedAt).toDateString() === new Date().toDateString()
                 ).length}
               </div>
-              <p className="text-muted-foreground">out of {pendingCount + deliveredCount} total</p>
+              <p className="text-sm md:text-base text-muted-foreground">out of {pendingCount + deliveredCount} total</p>
             </CardContent>
           </Card>
         </div>
         
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        <div className="grid grid-cols-1 lg:grid-cols-2 gap-4 md:gap-6">
           <Card>
-            <CardHeader>
-              <CardTitle>Update Delivery Status</CardTitle>
-              <CardDescription>
+            <CardHeader className="px-4 py-3 md:px-6 md:py-4">
+              <CardTitle className="text-base md:text-lg">Update Delivery Status</CardTitle>
+              <CardDescription className="text-xs md:text-sm">
                 Search for an order by Serial Number, Customer Name, or House Number
               </CardDescription>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-4">
-                <div className="flex flex-col space-y-2">
-                  <Label htmlFor="search-type">Search by</Label>
+            <CardContent className="px-4 pb-4 md:px-6">
+              <div className="space-y-3 md:space-y-4">
+                <div className="flex flex-col space-y-1.5">
+                  <Label htmlFor="search-type" className="text-sm">Search by</Label>
                   <Select 
                     value={searchType} 
                     onValueChange={(value) => setSearchType(value as SearchType)}
                   >
-                    <SelectTrigger id="search-type" className="w-full">
+                    <SelectTrigger id="search-type" className="w-full h-9">
                       <SelectValue placeholder="Select search type" />
                     </SelectTrigger>
                     <SelectContent>
@@ -248,48 +238,49 @@ const DeliveryPage = () => {
                       value={searchQuery}
                       onChange={(e) => setSearchQuery(e.target.value)}
                       onKeyDown={(e) => e.key === "Enter" && handleSearch()}
+                      className="h-9"
                     />
                   </div>
-                  <Button onClick={handleSearch} disabled={isSearching || !searchQuery}>
+                  <Button onClick={handleSearch} disabled={isSearching || !searchQuery} size={isMobile ? "sm" : "default"}>
                     {isSearching ? (
                       <span className="h-4 w-4 rounded-full border-2 border-current border-r-transparent animate-spin mr-2" />
                     ) : (
-                      <Search className="h-4 w-4 mr-2" />
+                      <Search className="h-3.5 w-3.5 md:h-4 md:w-4 mr-1.5 md:mr-2" />
                     )}
                     Search
                   </Button>
                 </div>
                 
                 {currentOrder ? (
-                  <div className="rounded-lg border p-4">
-                    <div className="grid grid-cols-2 gap-y-3">
+                  <div className="rounded-lg border p-3 md:p-4">
+                    <div className="grid grid-cols-2 gap-x-3 gap-y-2 md:gap-y-3">
                       <div>
-                        <p className="text-sm text-muted-foreground">Serial Number</p>
-                        <p className="font-medium">{currentOrder.serialNumber}</p>
+                        <p className="text-xs md:text-sm text-muted-foreground">Serial Number</p>
+                        <p className="text-sm md:text-base font-medium">{currentOrder.serialNumber}</p>
                       </div>
                       <div>
-                        <p className="text-sm text-muted-foreground">Date</p>
-                        <p className="font-medium">
+                        <p className="text-xs md:text-sm text-muted-foreground">Date</p>
+                        <p className="text-sm md:text-base font-medium">
                           {new Date(currentOrder.date).toLocaleDateString()}
                         </p>
                       </div>
                       <div>
-                        <p className="text-sm text-muted-foreground">Customer</p>
-                        <p className="font-medium">{currentOrder.name}</p>
+                        <p className="text-xs md:text-sm text-muted-foreground">Customer</p>
+                        <p className="text-sm md:text-base font-medium">{currentOrder.name}</p>
                       </div>
                       <div>
-                        <p className="text-sm text-muted-foreground">People</p>
-                        <p className="font-medium">{currentOrder.numberOfPeople}</p>
+                        <p className="text-xs md:text-sm text-muted-foreground">People</p>
+                        <p className="text-sm md:text-base font-medium">{currentOrder.numberOfPeople}</p>
                       </div>
                       <div>
-                        <p className="text-sm text-muted-foreground">Amount</p>
-                        <p className="font-medium">${currentOrder.amount.toLocaleString()}</p>
+                        <p className="text-xs md:text-sm text-muted-foreground">Amount</p>
+                        <p className="text-sm md:text-base font-medium">${currentOrder.amount.toLocaleString()}</p>
                       </div>
                       <div>
-                        <p className="text-sm text-muted-foreground">Status</p>
-                        <p className="font-medium">
+                        <p className="text-xs md:text-sm text-muted-foreground">Status</p>
+                        <p className="text-sm md:text-base font-medium">
                           <span
-                            className={`inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium ${
+                            className={`inline-flex items-center px-2 py-0.5 rounded-full text-xs font-medium ${
                               currentOrder.status === "delivered"
                                 ? "bg-green-100 text-green-800 dark:bg-green-900 dark:text-green-100"
                                 : "bg-amber-100 text-amber-800 dark:bg-amber-900 dark:text-amber-100"
@@ -301,20 +292,21 @@ const DeliveryPage = () => {
                       </div>
                     </div>
                     
-                    <div className="mt-4">
+                    <div className="mt-3 md:mt-4">
                       <Button 
-                        className="w-full"
+                        className="w-full h-9"
                         disabled={currentOrder.status === "delivered"}
                         onClick={handleMarkDelivered}
+                        size={isMobile ? "sm" : "default"}
                       >
                         {currentOrder.status === "delivered" ? (
                           <>
-                            <CheckCircle className="h-4 w-4 mr-2" />
+                            <CheckCircle className="h-3.5 w-3.5 md:h-4 md:w-4 mr-1.5 md:mr-2" />
                             Already Delivered
                           </>
                         ) : (
                           <>
-                            <Truck className="h-4 w-4 mr-2" />
+                            <Truck className="h-3.5 w-3.5 md:h-4 md:w-4 mr-1.5 md:mr-2" />
                             Mark as Delivered
                           </>
                         )}
@@ -322,11 +314,11 @@ const DeliveryPage = () => {
                     </div>
                   </div>
                 ) : isSearching ? (
-                  <div className="flex items-center justify-center py-8">
-                    <div className="h-8 w-8 rounded-full border-4 border-primary border-t-transparent animate-spin"></div>
+                  <div className="flex items-center justify-center py-6 md:py-8">
+                    <div className="h-6 w-6 md:h-8 md:w-8 rounded-full border-3 border-primary border-t-transparent animate-spin"></div>
                   </div>
                 ) : searchQuery !== "" ? (
-                  <div className="text-center py-8 text-muted-foreground">
+                  <div className="text-center py-6 md:py-8 text-sm md:text-base text-muted-foreground">
                     No orders found with {searchType === "serialNumber" ? "serial number" : 
                       searchType === "name" ? "customer name" : "house number"} "{searchQuery}"
                   </div>
@@ -336,37 +328,37 @@ const DeliveryPage = () => {
           </Card>
           
           <Card>
-            <CardHeader className="flex flex-row items-center justify-between pb-2">
+            <CardHeader className="flex flex-row items-center justify-between pb-2 px-4 py-3 md:px-6 md:py-4">
               <div>
-                <CardTitle>Recent Orders</CardTitle>
-                <CardDescription>
+                <CardTitle className="text-base md:text-lg">Recent Orders</CardTitle>
+                <CardDescription className="text-xs md:text-sm">
                   View and manage recent delivery orders
                 </CardDescription>
               </div>
               <div className="flex items-center space-x-2">
-                <Label htmlFor="status-filter" className="text-sm">Show:</Label>
+                <Label htmlFor="status-filter" className="text-xs md:text-sm hidden xs:inline">Show:</Label>
                 <select
                   id="status-filter"
-                  className="text-sm border rounded px-2 py-1"
+                  className="text-xs md:text-sm border rounded px-1.5 py-0.5 md:px-2 md:py-1"
                   value={deliveryFilter}
                   onChange={(e) => setDeliveryFilter(e.target.value as any)}
                 >
                   <option value="all">All Orders</option>
-                  <option value="pending">Pending Only</option>
-                  <option value="delivered">Delivered Only</option>
+                  <option value="pending">Pending</option>
+                  <option value="delivered">Delivered</option>
                 </select>
               </div>
             </CardHeader>
-            <CardContent>
+            <CardContent className="px-3 md:px-6">
               <div className="rounded-lg border overflow-hidden">
-                <div className="overflow-y-auto max-h-[350px]">
-                  <table className="w-full text-sm">
+                <div className="overflow-y-auto max-h-[280px] md:max-h-[350px]">
+                  <table className="w-full text-xs md:text-sm">
                     <thead>
                       <tr className="bg-muted/50">
-                        <th className="px-4 py-2 text-left font-medium">House No.</th>
-                        <th className="px-4 py-2 text-left font-medium">Customer</th>
-                        <th className="px-4 py-2 text-left font-medium">Date</th>
-                        <th className="px-4 py-2 text-left font-medium">Status</th>
+                        <th className="px-2 md:px-4 py-1.5 md:py-2 text-left font-medium">House No.</th>
+                        <th className="px-2 md:px-4 py-1.5 md:py-2 text-left font-medium">Customer</th>
+                        <th className="px-2 md:px-4 py-1.5 md:py-2 text-left font-medium">Date</th>
+                        <th className="px-2 md:px-4 py-1.5 md:py-2 text-left font-medium">Status</th>
                       </tr>
                     </thead>
                     <tbody>
@@ -385,14 +377,14 @@ const DeliveryPage = () => {
                             );
                           }}
                         >
-                          <td className="px-4 py-2 font-medium">{order.houseNumber}</td>
-                          <td className="px-4 py-2">{order.name}</td>
-                          <td className="px-4 py-2 whitespace-nowrap">
+                          <td className="px-2 md:px-4 py-1.5 md:py-2 font-medium">{order.houseNumber}</td>
+                          <td className="px-2 md:px-4 py-1.5 md:py-2">{order.name}</td>
+                          <td className="px-2 md:px-4 py-1.5 md:py-2 whitespace-nowrap">
                             {new Date(order.date).toLocaleDateString()}
                           </td>
-                          <td className="px-4 py-2">
+                          <td className="px-2 md:px-4 py-1.5 md:py-2">
                             <span
-                              className={`inline-block w-2 h-2 rounded-full mr-1 ${
+                              className={`inline-block w-1.5 h-1.5 md:w-2 md:h-2 rounded-full mr-1 ${
                                 order.status === "delivered" ? "bg-green-500" : "bg-amber-500"
                               }`}
                             ></span>
@@ -405,7 +397,7 @@ const DeliveryPage = () => {
                         <tr>
                           <td 
                             colSpan={4} 
-                            className="px-4 py-6 text-center text-muted-foreground"
+                            className="px-2 md:px-4 py-4 md:py-6 text-center text-xs md:text-sm text-muted-foreground"
                           >
                             No orders found with the selected filter.
                           </td>

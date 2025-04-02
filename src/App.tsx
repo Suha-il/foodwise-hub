@@ -6,6 +6,8 @@ import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
+import { ToastContainer } from "@/components/ui/toast-container";
+import { ErrorBoundary } from "@/components/error/ErrorBoundary";
 
 // Pages
 import Index from "./pages/Index";
@@ -38,33 +40,35 @@ const queryClient = new QueryClient({
     queries: {
       staleTime: 5 * 60 * 1000, // 5 minutes
       refetchOnWindowFocus: false,
-      // Removing the suspense property as it doesn't exist in the current version
     },
   },
 });
 
 const App = () => (
-  <QueryClientProvider client={queryClient}>
-    <TooltipProvider>
-      <Toaster />
-      <Sonner />
-      <BrowserRouter>
-        <AnimatePresence mode="wait">
-          <Suspense fallback={<LoadingFallback />}>
-            <Routes>
-              <Route path="/" element={<Index />} />
-              <Route path="/orders" element={<OrderPage />} />
-              <Route path="/delivery" element={<DeliveryPage />} />
-              <Route path="/finance" element={<FinancePage />} />
-              <Route path="/stats" element={<StatsPage />} />
-              <Route path="/project" element={<ProjectPage />} />
-              <Route path="*" element={<NotFound />} />
-            </Routes>
-          </Suspense>
-        </AnimatePresence>
-      </BrowserRouter>
-    </TooltipProvider>
-  </QueryClientProvider>
+  <ErrorBoundary>
+    <QueryClientProvider client={queryClient}>
+      <TooltipProvider>
+        <Toaster />
+        <Sonner />
+        <ToastContainer />
+        <BrowserRouter>
+          <AnimatePresence mode="wait">
+            <Suspense fallback={<LoadingFallback />}>
+              <Routes>
+                <Route path="/" element={<Index />} />
+                <Route path="/orders" element={<OrderPage />} />
+                <Route path="/delivery" element={<DeliveryPage />} />
+                <Route path="/finance" element={<FinancePage />} />
+                <Route path="/stats" element={<StatsPage />} />
+                <Route path="/project" element={<ProjectPage />} />
+                <Route path="*" element={<NotFound />} />
+              </Routes>
+            </Suspense>
+          </AnimatePresence>
+        </BrowserRouter>
+      </TooltipProvider>
+    </QueryClientProvider>
+  </ErrorBoundary>
 );
 
 export default App;

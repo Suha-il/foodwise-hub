@@ -1,4 +1,3 @@
-
 import type { Config } from "tailwindcss";
 
 export default {
@@ -21,6 +20,7 @@ export default {
 		extend: {
 			screens: {
 				'xs': '480px',
+				'2xs': '360px',
 			},
 			fontFamily: {
 				sans: ['Inter', 'sans-serif'],
@@ -28,12 +28,12 @@ export default {
 			},
 			fontSize: {
 				'xs': ['0.75rem', { lineHeight: '1rem' }],
-				'sm': ['0.875rem', { lineHeight: '1.25rem' }],
+				'sm': ['0.813rem', { lineHeight: '1.25rem' }],
 				'base': ['0.9375rem', { lineHeight: '1.5rem' }],
-				'lg': ['1.125rem', { lineHeight: '1.75rem' }],
-				'xl': ['1.25rem', { lineHeight: '1.75rem' }],
-				'2xl': ['1.5rem', { lineHeight: '2rem' }],
-				'3xl': ['1.875rem', { lineHeight: '2.25rem' }],
+				'lg': ['1.0625rem', { lineHeight: '1.75rem' }],
+				'xl': ['1.175rem', { lineHeight: '1.75rem' }],
+				'2xl': ['1.375rem', { lineHeight: '2rem' }],
+				'3xl': ['1.75rem', { lineHeight: '2.25rem' }],
 			},
 			colors: {
 				border: 'hsl(var(--border))',
@@ -156,6 +156,12 @@ export default {
 				'glass': 'linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.2))',
 				'glass-dark': 'linear-gradient(135deg, rgba(40, 40, 40, 0.4), rgba(20, 20, 20, 0.2))',
 				'gradient-shimmer': 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent)'
+			},
+			spacing: {
+				'safe-bottom': 'env(safe-area-inset-bottom)',
+				'safe-top': 'env(safe-area-inset-top)',
+				'safe-left': 'env(safe-area-inset-left)',
+				'safe-right': 'env(safe-area-inset-right)',
 			}
 		}
 	},

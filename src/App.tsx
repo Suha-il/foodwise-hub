@@ -21,16 +21,16 @@ const StatsPage = lazy(() => import("./pages/StatsPage"));
 const ProjectPage = lazy(() => import("./pages/ProjectPage"));
 
 const LoadingFallback = () => (
-  <div className="min-h-screen flex flex-col items-center justify-center">
+  <div className="min-h-screen flex flex-col items-center justify-center p-4">
     <motion.div
       initial={{ opacity: 0 }}
       animate={{ opacity: 1 }}
       exit={{ opacity: 0 }}
       transition={{ duration: 0.3 }}
-      className="space-y-4 text-center"
+      className="space-y-3 text-center"
     >
-      <div className="w-10 h-10 mx-auto rounded-full border-4 border-primary border-t-transparent animate-spin"></div>
-      <p className="text-muted-foreground text-sm animate-pulse">Loading application...</p>
+      <div className="w-8 h-8 sm:w-10 sm:h-10 mx-auto rounded-full border-3 sm:border-4 border-primary border-t-transparent animate-spin"></div>
+      <p className="text-sm text-muted-foreground animate-pulse">Loading application...</p>
     </motion.div>
   </div>
 );

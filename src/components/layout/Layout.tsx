@@ -94,26 +94,26 @@ export default function Layout({ children, role = "user", projectName = "Food De
       {/* Sidebar */}
       <aside
         className={cn(
-          "fixed inset-y-0 left-0 z-50 w-64 bg-sidebar transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-auto lg:flex-shrink-0",
+          "fixed inset-y-0 left-0 z-50 w-60 bg-sidebar transform transition-transform duration-300 ease-in-out lg:translate-x-0 lg:static lg:inset-auto lg:flex-shrink-0",
           isSidebarOpen ? "translate-x-0" : "-translate-x-full"
         )}
       >
         <div className="flex flex-col h-full">
           {/* Sidebar header */}
-          <div className="flex items-center justify-between h-16 px-4 border-b border-sidebar-border">
-            <h1 className="text-xl font-semibold text-sidebar-foreground truncate">{projectName}</h1>
+          <div className="flex items-center justify-between h-14 sm:h-16 px-3 sm:px-4 border-b border-sidebar-border">
+            <h1 className="text-base sm:text-lg font-semibold text-sidebar-foreground truncate">{projectName}</h1>
             <Button
               variant="ghost"
-              size="icon"
+              size="sm"
               className="lg:hidden"
               onClick={() => setIsSidebarOpen(false)}
             >
-              <X className="h-5 w-5" />
+              <X className="h-4 w-4" />
             </Button>
           </div>
           
           {/* Navigation */}
-          <nav className="flex-1 overflow-y-auto py-4 px-2">
+          <nav className="flex-1 overflow-y-auto py-3 px-2">
             <ul className="space-y-1">
               {filteredNavItems.map((item) => (
                 <li key={item.name}>
@@ -126,7 +126,7 @@ export default function Layout({ children, role = "user", projectName = "Food De
                         : "text-sidebar-foreground hover:bg-sidebar-accent"
                     )}
                   >
-                    <item.icon className="mr-3 h-5 w-5" />
+                    <item.icon className="mr-2.5 h-4 w-4" />
                     {item.name}
                   </Link>
                 </li>
@@ -135,13 +135,13 @@ export default function Layout({ children, role = "user", projectName = "Food De
           </nav>
           
           {/* Sidebar footer */}
-          <div className="p-4 border-t border-sidebar-border">
+          <div className="p-3 border-t border-sidebar-border">
             <div className="flex items-center">
-              <div className="w-8 h-8 rounded-full bg-primary flex items-center justify-center text-white">
+              <div className="w-7 h-7 sm:w-8 sm:h-8 rounded-full bg-primary flex items-center justify-center text-white text-xs sm:text-sm">
                 {role === "main_admin" ? "MA" : role === "admin" ? "A" : "U"}
               </div>
-              <div className="ml-3">
-                <p className="text-sm font-medium text-sidebar-foreground capitalize">
+              <div className="ml-2 sm:ml-3">
+                <p className="text-xs sm:text-sm font-medium text-sidebar-foreground capitalize">
                   {role.replace("_", " ")}
                 </p>
                 <button className="text-xs text-sidebar-foreground/70 flex items-center hover:text-primary">
@@ -166,23 +166,26 @@ export default function Layout({ children, role = "user", projectName = "Food De
       <div className="flex-1 flex flex-col min-w-0 overflow-hidden">
         {/* Top navigation bar */}
         <header className="sticky top-0 z-30 bg-background/80 backdrop-blur-md border-b border-border">
-          <div className="flex h-16 items-center px-4">
+          <div className="flex h-14 sm:h-16 items-center px-3 sm:px-4">
             <Button
               variant="ghost"
-              size="icon"
+              size="sm"
               className="lg:hidden"
               onClick={() => setIsSidebarOpen(true)}
             >
               <Menu className="h-5 w-5" />
             </Button>
-            <div className="ml-auto flex items-center space-x-4">
-              <span className="text-sm text-muted-foreground">
+            <div className="ml-auto flex items-center space-x-3 sm:space-x-4">
+              <span className="hidden sm:inline text-xs sm:text-sm text-muted-foreground">
                 {new Date().toLocaleDateString(undefined, { 
                   weekday: 'long', 
                   year: 'numeric', 
                   month: 'long', 
                   day: 'numeric' 
                 })}
+              </span>
+              <span className="inline sm:hidden text-xs sm:text-sm text-muted-foreground">
+                {new Date().toLocaleDateString()}
               </span>
             </div>
           </div>

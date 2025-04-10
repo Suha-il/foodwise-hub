@@ -65,8 +65,9 @@
 }
 
 @layer components {
+  /* Updated glass-card to be less transparent and more readable */
   .glass-card {
-    @apply bg-white/70 dark:bg-gray-900/70 backdrop-blur-md border border-white/20 dark:border-gray-800/30 shadow-glass rounded-xl;
+    @apply bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border border-white/30 dark:border-gray-800/50 shadow-md rounded-xl;
   }
   
   .neo-card {
@@ -86,15 +87,16 @@
   }
   
   .card-hover {
-    @apply transition-all duration-300 hover:shadow-glass-strong hover:-translate-y-1;
+    @apply transition-all duration-300 hover:shadow-md hover:-translate-y-1;
   }
   
   .input-animated {
     @apply transition-all duration-200 focus:ring-2 focus:ring-primary/50 focus:border-primary/80;
   }
 
+  /* Updated stat-card to be less transparent */
   .stat-card {
-    @apply glass-card p-3 sm:p-4 hover:shadow-glass-strong transition-all duration-300 hover:-translate-y-1;
+    @apply bg-white dark:bg-gray-900 p-3 sm:p-4 hover:shadow-md transition-all duration-300 hover:-translate-y-1 rounded-xl border border-gray-200 dark:border-gray-800;
   }
   
   .data-grid {
@@ -102,15 +104,16 @@
   }
   
   .data-grid-header {
-    @apply bg-secondary/50 border-b;
+    @apply bg-gray-100 dark:bg-gray-800 border-b;
   }
   
   .data-grid-cell {
-    @apply px-3 sm:px-4 py-2 sm:py-3 border-b last:border-b-0 transition-colors hover:bg-muted/30;
+    @apply px-3 sm:px-4 py-2 sm:py-3 border-b last:border-b-0 transition-colors hover:bg-gray-50 dark:hover:bg-gray-800/70;
   }
   
+  /* Updated animated background to be less distracting */
   .animated-bg {
-    @apply relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-white/5 before:to-transparent before:translate-x-[-100%] hover:before:animate-[shimmer_2s_infinite];
+    @apply relative overflow-hidden before:absolute before:inset-0 before:bg-gradient-to-r before:from-transparent before:via-gray-200/20 dark:before:via-gray-700/20 before:to-transparent before:translate-x-[-100%] hover:before:animate-[shimmer_2s_infinite];
   }
   
   @keyframes shimmer {
@@ -119,13 +122,13 @@
     }
   }
   
-  /* Mobile-specific components */
+  /* Mobile-specific components with improved readability */
   .mobile-card {
-    @apply rounded-lg shadow-sm border border-border bg-card p-2.5 sm:p-3;
+    @apply rounded-lg shadow-sm border border-gray-200 dark:border-gray-800 bg-white dark:bg-gray-900 p-2.5 sm:p-3;
   }
   
   .mobile-input {
-    @apply h-10 rounded-md px-3 text-sm;
+    @apply h-10 rounded-md px-3 text-sm bg-white dark:bg-gray-800;
   }
   
   .mobile-button {
@@ -136,7 +139,7 @@
     @apply min-h-[44px] min-w-[44px] flex items-center justify-center;
   }
 
-  /* Form controls optimized for mobile */
+  /* Form controls optimized for mobile with better contrast */
   .form-control-mobile {
     @apply flex flex-col gap-1.5 mb-4;
   }
@@ -148,12 +151,12 @@
   .form-control-mobile input,
   .form-control-mobile select,
   .form-control-mobile textarea {
-    @apply px-3 py-2 rounded-md border border-input;
+    @apply px-3 py-2 rounded-md border border-input bg-white dark:bg-gray-800;
   }
 
   /* Mobile optimized containers */
   .mobile-container {
-    @apply px-3 sm:px-4 py-3 sm:py-4;
+    @apply px-3 sm:px-4 py-3 sm:py-4 bg-white dark:bg-gray-900;
   }
 
   /* Mobile optimized headings */
@@ -167,63 +170,14 @@
   }
 }
 
-@keyframes float {
-  0%, 100% {
-    transform: translateY(0);
-  }
-  50% {
-    transform: translateY(-5px);
-  }
-}
-
-@keyframes pulse {
-  0%, 100% {
-    opacity: 1;
-  }
-  50% {
-    opacity: 0.5;
-  }
-}
-
-@keyframes shine {
-  0% {
-    background-position: 200% 0;
-  }
-  100% {
-    background-position: -200% 0;
-  }
-}
+/* ... keep existing code (keyframes animations) */
 
 /* Mobile and small screen utilities */
 @media (max-width: 640px) {
-  .xs\:inline {
-    display: inline;
-  }
-  
-  .xs\:hidden {
-    display: none;
-  }
-  
-  .touch-safe-bottom {
-    padding-bottom: max(env(safe-area-inset-bottom), 1rem);
-  }
-  
-  .touch-safe-top {
-    padding-top: max(env(safe-area-inset-top), 1rem);
-  }
+  /* ... keep existing code (mobile utilities) */
 }
 
 /* Additional mobile optimizations */
 @media (max-width: 480px) {
-  .mobile-grid {
-    @apply grid grid-cols-1 gap-3;
-  }
-  
-  .mobile-stack > * + * {
-    @apply mt-3;
-  }
-  
-  .mobile-compact {
-    @apply p-2 text-sm;
-  }
+  /* ... keep existing code (additional mobile optimizations) */
 }

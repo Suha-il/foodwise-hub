@@ -1,458 +1,224 @@
 
-import { useState, useEffect } from "react";
 import Layout from "@/components/layout/Layout";
-import { UserRole, Order, Expenditure, FinancialSummary } from "@/lib/types";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { DollarSign, CreditCard, TrendingUp, ArrowUpRight, Download, FileText } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
-import { Label } from "@/components/ui/label";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { 
-  PlusCircle, 
-  DollarSign, 
-  ArrowUpFromLine, 
-  ArrowDownToLine,
-  TrendingUp,
-  Filter,
-  Calendar,
-  Wallet
-} from "lucide-react";
-import { 
-  BarChart, 
-  Bar, 
-  PieChart, 
-  Pie, 
-  Cell, 
-  ResponsiveContainer,
-  XAxis,
-  YAxis,
-  Tooltip,
-  Legend,
-} from "recharts";
+import { useIsMobile } from "@/hooks/use-mobile";
 
-const FinancePage = () => {
-  const [userRole, setUserRole] = useState<UserRole>("main_admin");
-  const [projectName, setProjectName] = useState("Food Delivery");
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [expenditures, setExpenditures] = useState<Expenditure[]>([]);
-  const [financialSummary, setFinancialSummary] = useState<FinancialSummary>({
-    totalIncome: 0,
-    totalExpenditure: 0,
-    balance: 0,
-  });
-  
-  // In a real app, fetch this from localStorage or a state management solution
-  useEffect(() => {
-    const storedRole = localStorage.getItem("user_role") as UserRole | null;
-    const storedName = localStorage.getItem("project_name");
-    
-    if (storedRole) {
-      setUserRole(storedRole);
-    }
-    
-    if (storedName) {
-      setProjectName(storedName);
-    }
-    
-    // Mock data for demonstration
-    const mockOrders: Order[] = Array.from({ length: 30 }, (_, i) => ({
-      id: `order-${i + 1}`,
-      serialNumber: `SN-${1000 + i}`,
-      date: new Date(2023, 7, 20 - i % 10).toISOString(),
-      houseNumber: `H-${100 + i}`,
-      name: `Customer ${i + 1}`,
-      numberOfPeople: Math.floor(Math.random() * 5) + 1,
-      amount: Math.floor(Math.random() * 3000) + 1000,
-      status: i % 3 === 0 ? "delivered" : "pending",
-      projectId: "project-1",
-      createdAt: new Date(2023, 7, 20 - i % 10).toISOString(),
-      updatedAt: new Date(2023, 7, 20 - i % 10).toISOString(),
-    }));
-    
-    const mockExpenditures: Expenditure[] = [
-      {
-        id: "exp-1",
-        category: "Transport",
-        amount: 5000,
-        date: new Date(2023, 7, 19).toISOString(),
-        description: "Fuel for delivery vehicles",
-        projectId: "project-1",
-        createdAt: new Date(2023, 7, 19).toISOString(),
-      },
-      {
-        id: "exp-2",
-        category: "Packaging",
-        amount: 3500,
-        date: new Date(2023, 7, 18).toISOString(),
-        description: "Food containers and bags",
-        projectId: "project-1",
-        createdAt: new Date(2023, 7, 18).toISOString(),
-      },
-      {
-        id: "exp-3",
-        category: "Staff",
-        amount: 12000,
-        date: new Date(2023, 7, 17).toISOString(),
-        description: "Delivery staff salaries",
-        projectId: "project-1",
-        createdAt: new Date(2023, 7, 17).toISOString(),
-      },
-      {
-        id: "exp-4",
-        category: "Maintenance",
-        amount: 2000,
-        date: new Date(2023, 7, 16).toISOString(),
-        description: "Vehicle maintenance",
-        projectId: "project-1",
-        createdAt: new Date(2023, 7, 16).toISOString(),
-      },
-    ];
-    
-    setOrders(mockOrders);
-    setExpenditures(mockExpenditures);
-    
-    // Calculate financial summary
-    const totalIncome = mockOrders.reduce((sum, order) => sum + order.amount, 0);
-    const totalExpenditure = mockExpenditures.reduce((sum, exp) => sum + exp.amount, 0);
-    
-    setFinancialSummary({
-      totalIncome,
-      totalExpenditure,
-      balance: totalIncome - totalExpenditure,
-    });
-  }, []);
-  
-  const handleAddExpenditure = (e: React.FormEvent) => {
-    e.preventDefault();
-    // In a real app, this would submit to an API
-    const formData = new FormData(e.target as HTMLFormElement);
-    
-    const newExpenditure: Expenditure = {
-      id: `exp-${expenditures.length + 1}`,
-      category: formData.get("category") as string,
-      amount: parseInt(formData.get("amount") as string),
-      date: (formData.get("date") as string) 
-        ? new Date(formData.get("date") as string).toISOString() 
-        : new Date().toISOString(),
-      description: formData.get("description") as string,
-      projectId: "project-1",
-      createdAt: new Date().toISOString(),
-    };
-    
-    const updatedExpenditures = [...expenditures, newExpenditure];
-    setExpenditures(updatedExpenditures);
-    
-    // Update financial summary
-    const totalExpenditure = updatedExpenditures.reduce((sum, exp) => sum + exp.amount, 0);
-    setFinancialSummary({
-      ...financialSummary,
-      totalExpenditure,
-      balance: financialSummary.totalIncome - totalExpenditure,
-    });
-    
-    // Reset form
-    (e.target as HTMLFormElement).reset();
+interface TransactionProps {
+  id: string;
+  date: string;
+  amount: string;
+  status: "completed" | "pending" | "failed";
+  description: string;
+}
+
+const transactions: TransactionProps[] = [
+  {
+    id: "TX123456",
+    date: "2025-04-08",
+    amount: "$240.00",
+    status: "completed",
+    description: "Daily sales deposit"
+  },
+  {
+    id: "TX123457",
+    date: "2025-04-07",
+    amount: "$354.50",
+    status: "completed",
+    description: "Daily sales deposit"
+  },
+  {
+    id: "TX123458",
+    date: "2025-04-07",
+    amount: "$20.00",
+    status: "pending",
+    description: "Refund - Order #45821"
+  },
+  {
+    id: "TX123459",
+    date: "2025-04-06",
+    amount: "$289.75",
+    status: "completed",
+    description: "Daily sales deposit"
+  },
+  {
+    id: "TX123460",
+    date: "2025-04-05",
+    amount: "$15.00",
+    status: "failed",
+    description: "Payment processing fee"
+  }
+];
+
+const TransactionRow = ({ transaction }: { transaction: TransactionProps }) => {
+  const statusColor = {
+    completed: "text-green-600 dark:text-green-400 bg-green-50 dark:bg-green-900/20",
+    pending: "text-yellow-600 dark:text-yellow-400 bg-yellow-50 dark:bg-yellow-900/20",
+    failed: "text-red-600 dark:text-red-400 bg-red-50 dark:bg-red-900/20"
   };
   
-  // Prepare data for charts
-  const pieData = [
-    { name: "Income", value: financialSummary.totalIncome, color: "#4f46e5" },
-    { name: "Expenditure", value: financialSummary.totalExpenditure, color: "#ef4444" },
-  ];
-  
-  const expenditureByCategory = expenditures.reduce((acc, exp) => {
-    if (!acc[exp.category]) {
-      acc[exp.category] = 0;
-    }
-    acc[exp.category] += exp.amount;
-    return acc;
-  }, {} as Record<string, number>);
-  
-  const expenditurePieData = Object.entries(expenditureByCategory).map(([name, value], index) => ({
-    name,
-    value,
-    color: ["#f97316", "#10b981", "#6366f1", "#ec4899", "#f59e0b"][index % 5],
-  }));
-  
-  // Group orders by date for the bar chart
-  const ordersByDate = orders.reduce((acc, order) => {
-    const date = new Date(order.date).toLocaleDateString();
-    if (!acc[date]) {
-      acc[date] = 0;
-    }
-    acc[date] += order.amount;
-    return acc;
-  }, {} as Record<string, number>);
-  
-  const barChartData = Object.entries(ordersByDate)
-    .map(([date, amount]) => ({ date, amount }))
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-    .slice(-7); // Last 7 days
-  
-  const formatCurrency = (value: number) => {
-    return `$${value.toLocaleString()}`;
-  };
-
   return (
-    <Layout role={userRole} projectName={projectName}>
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold tracking-tight">Financial Management</h1>
-        </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="bg-white">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl flex items-center">
-                <ArrowUpFromLine className="mr-2 h-5 w-5 text-green-500" />
-                Total Income
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-green-600">
-                ${financialSummary.totalIncome.toLocaleString()}
-              </div>
-              <p className="text-muted-foreground">
-                From {orders.length} orders
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-white">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl flex items-center">
-                <ArrowDownToLine className="mr-2 h-5 w-5 text-red-500" />
-                Total Expenditure
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold text-red-600">
-                ${financialSummary.totalExpenditure.toLocaleString()}
-              </div>
-              <p className="text-muted-foreground">
-                Across {expenditures.length} entries
-              </p>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-white">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl flex items-center">
-                <Wallet className="mr-2 h-5 w-5 text-primary" />
-                Current Balance
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className={`text-3xl font-bold ${
-                financialSummary.balance >= 0 ? "text-green-600" : "text-red-600"
-              }`}>
-                ${financialSummary.balance.toLocaleString()}
-              </div>
-              <p className="text-muted-foreground">
-                {financialSummary.balance >= 0 ? "Profit" : "Loss"}
-              </p>
-            </CardContent>
-          </Card>
-        </div>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Income Overview</CardTitle>
-              <CardDescription>
-                Last 7 days of income from orders
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={barChartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                  <XAxis dataKey="date" />
-                  <YAxis tickFormatter={(value) => `$${value/1000}k`} />
-                  <Tooltip formatter={(value) => [`$${(value as number).toLocaleString()}`, "Amount"]} />
-                  <Legend />
-                  <Bar dataKey="amount" name="Income" fill="#4f46e5" />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader>
-              <CardTitle>Expenditure by Category</CardTitle>
-              <CardDescription>
-                Breakdown of expenses by category
-              </CardDescription>
-            </CardHeader>
-            <CardContent className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={expenditurePieData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {expenditurePieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(value) => [`$${(value as number).toLocaleString()}`, "Amount"]} />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-        </div>
-        
-        <div className="grid grid-cols-1 gap-6">
-          <Card>
-            <CardHeader>
-              <CardTitle>Manage Expenditures</CardTitle>
-              <CardDescription>
-                Record and view financial expenditures for your project
-              </CardDescription>
-            </CardHeader>
-            <CardContent>
-              <Tabs defaultValue="list">
-                <TabsList className="mb-4">
-                  <TabsTrigger value="list">Expenditure List</TabsTrigger>
-                  <TabsTrigger value="add">Add Expenditure</TabsTrigger>
-                </TabsList>
-                
-                <TabsContent value="list">
-                  <div className="rounded-lg border overflow-hidden">
-                    <div className="overflow-x-auto">
-                      <table className="w-full text-sm">
-                        <thead>
-                          <tr className="bg-muted/50">
-                            <th className="px-4 py-3 text-left font-medium">Date</th>
-                            <th className="px-4 py-3 text-left font-medium">Category</th>
-                            <th className="px-4 py-3 text-left font-medium">Description</th>
-                            <th className="px-4 py-3 text-left font-medium">Amount</th>
-                          </tr>
-                        </thead>
-                        <tbody>
-                          {expenditures.map((exp) => (
-                            <tr key={exp.id} className="border-t hover:bg-muted/30">
-                              <td className="px-4 py-3">
-                                {new Date(exp.date).toLocaleDateString()}
-                              </td>
-                              <td className="px-4 py-3">
-                                <span className="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-medium bg-primary/10 text-primary">
-                                  {exp.category}
-                                </span>
-                              </td>
-                              <td className="px-4 py-3">{exp.description}</td>
-                              <td className="px-4 py-3 text-red-600 font-medium">
-                                -${exp.amount.toLocaleString()}
-                              </td>
-                            </tr>
-                          ))}
-                          
-                          {expenditures.length === 0 && (
-                            <tr>
-                              <td 
-                                colSpan={4} 
-                                className="px-4 py-6 text-center text-muted-foreground"
-                              >
-                                No expenditures recorded yet. Add your first expense.
-                              </td>
-                            </tr>
-                          )}
-                        </tbody>
-                      </table>
-                    </div>
-                  </div>
-                </TabsContent>
-                
-                <TabsContent value="add">
-                  <form id="expenditure-form" onSubmit={handleAddExpenditure}>
-                    <div className="grid gap-6">
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="category">Category</Label>
-                          <Select name="category" required>
-                            <SelectTrigger id="category">
-                              <SelectValue placeholder="Select category" />
-                            </SelectTrigger>
-                            <SelectContent>
-                              <SelectItem value="Transport">Transport</SelectItem>
-                              <SelectItem value="Packaging">Packaging</SelectItem>
-                              <SelectItem value="Staff">Staff</SelectItem>
-                              <SelectItem value="Maintenance">Maintenance</SelectItem>
-                              <SelectItem value="Other">Other</SelectItem>
-                            </SelectContent>
-                          </Select>
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor="amount">Amount ($)</Label>
-                          <Input
-                            id="amount"
-                            name="amount"
-                            type="number"
-                            min="0"
-                            step="0.01"
-                            placeholder="e.g., 1250"
-                            required
-                          />
-                        </div>
-                      </div>
-                      
-                      <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                        <div className="space-y-2">
-                          <Label htmlFor="date">Date</Label>
-                          <Input
-                            id="date"
-                            name="date"
-                            type="date"
-                            defaultValue={new Date().toISOString().split('T')[0]}
-                          />
-                        </div>
-                        
-                        <div className="space-y-2">
-                          <Label htmlFor="description">Description</Label>
-                          <Input
-                            id="description"
-                            name="description"
-                            placeholder="Brief description of the expenditure"
-                            required
-                          />
-                        </div>
-                      </div>
-                      
-                      <Button type="submit" className="w-full md:w-auto">
-                        <PlusCircle className="mr-2 h-4 w-4" />
-                        Add Expenditure
-                      </Button>
-                    </div>
-                  </form>
-                </TabsContent>
-              </Tabs>
-            </CardContent>
-          </Card>
+    <div className="flex items-center justify-between py-3 border-b border-gray-200 dark:border-gray-800 last:border-0">
+      <div className="flex flex-col">
+        <span className="font-medium">{transaction.description}</span>
+        <div className="flex items-center gap-2">
+          <span className="text-xs text-gray-500 dark:text-gray-400">{transaction.id}</span>
+          <span className="text-xs text-gray-500 dark:text-gray-400">
+            {new Date(transaction.date).toLocaleDateString()}
+          </span>
         </div>
       </div>
-    </Layout>
+      <div className="flex items-center gap-2">
+        <span className="font-medium">{transaction.amount}</span>
+        <span className={`text-xs px-2 py-0.5 rounded-full ${statusColor[transaction.status]}`}>
+          {transaction.status.charAt(0).toUpperCase() + transaction.status.slice(1)}
+        </span>
+      </div>
+    </div>
   );
 };
 
-export default FinancePage;
+export default function FinancePage() {
+  const isMobile = useIsMobile();
+  
+  return (
+    <Layout role="admin">
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <h1 className="text-2xl font-bold tracking-tight">Finance</h1>
+          <div className="flex flex-wrap items-center gap-2">
+            <Button variant="outline" size="sm">
+              <FileText className="h-4 w-4 mr-2" />
+              Statements
+            </Button>
+            <Button variant="outline" size="sm">
+              <Download className="h-4 w-4 mr-2" />
+              Export
+            </Button>
+          </div>
+        </div>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+          <Card className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Total Revenue
+              </CardTitle>
+              <DollarSign className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">$32,840.53</div>
+              <p className="text-xs text-muted-foreground">
+                +10.1% from last month
+              </p>
+            </CardContent>
+          </Card>
+          <Card className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Pending Payouts
+              </CardTitle>
+              <CreditCard className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">$4,120.75</div>
+              <p className="text-xs text-muted-foreground">
+                Processing on Apr 15
+              </p>
+            </CardContent>
+          </Card>
+          <Card className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
+            <CardHeader className="flex flex-row items-center justify-between space-y-0 pb-2">
+              <CardTitle className="text-sm font-medium">
+                Growth Rate
+              </CardTitle>
+              <TrendingUp className="h-4 w-4 text-muted-foreground" />
+            </CardHeader>
+            <CardContent>
+              <div className="text-2xl font-bold">+12.5%</div>
+              <div className="flex items-center text-xs text-green-600 dark:text-green-400">
+                <ArrowUpRight className="h-3 w-3 mr-1" />
+                <span>Trending up</span>
+              </div>
+            </CardContent>
+          </Card>
+        </div>
+
+        <Tabs defaultValue="transactions" className="w-full">
+          <TabsList className="bg-gray-100 dark:bg-gray-800 mb-4">
+            <TabsTrigger value="transactions">Transactions</TabsTrigger>
+            <TabsTrigger value="invoices">Invoices</TabsTrigger>
+            <TabsTrigger value="reports">Reports</TabsTrigger>
+          </TabsList>
+          <TabsContent value="transactions">
+            <Card className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
+              <CardHeader>
+                <CardTitle>Recent Transactions</CardTitle>
+                <CardDescription>
+                  View your most recent financial transactions
+                </CardDescription>
+              </CardHeader>
+              <CardContent>
+                <div className="space-y-1">
+                  {transactions.map((transaction) => (
+                    <TransactionRow key={transaction.id} transaction={transaction} />
+                  ))}
+                </div>
+              </CardContent>
+              <CardFooter className="flex justify-between border-t border-gray-200 dark:border-gray-800 pt-4">
+                <Button variant="outline" size="sm">
+                  Previous
+                </Button>
+                <Button size="sm">View All Transactions</Button>
+              </CardFooter>
+            </Card>
+          </TabsContent>
+          <TabsContent value="invoices">
+            <Card className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
+              <CardHeader>
+                <CardTitle>Invoices</CardTitle>
+                <CardDescription>
+                  View and manage your invoice history
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="h-[300px] flex items-center justify-center">
+                <p className="text-muted-foreground text-center">
+                  No invoices found for the current period.<br />
+                  Check back later or change the date range.
+                </p>
+              </CardContent>
+              <CardFooter className="border-t border-gray-200 dark:border-gray-800 pt-4">
+                <Button className="w-full" variant="outline">
+                  Create New Invoice
+                </Button>
+              </CardFooter>
+            </Card>
+          </TabsContent>
+          <TabsContent value="reports">
+            <Card className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
+              <CardHeader>
+                <CardTitle>Financial Reports</CardTitle>
+                <CardDescription>
+                  Access your financial performance reports
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="h-[300px] flex items-center justify-center">
+                <div className="text-center">
+                  <p className="text-muted-foreground mb-4">
+                    Financial reports are generated on the 1st of each month
+                  </p>
+                  <Button variant="outline">
+                    <Download className="h-4 w-4 mr-2" />
+                    Download Last Report
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
+          </TabsContent>
+        </Tabs>
+      </div>
+    </Layout>
+  );
+}

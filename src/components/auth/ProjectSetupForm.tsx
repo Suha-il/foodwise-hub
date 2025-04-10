@@ -85,7 +85,7 @@ export default function ProjectSetupForm({ onBack, onComplete }: ProjectSetupFor
         Back
       </Button>
       
-      <div className="rounded-lg border bg-card text-card-foreground shadow animation-slide-up">
+      <div className="rounded-lg border bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800 text-card-foreground shadow animation-slide-up">
         <div className="flex flex-col space-y-1.5 p-6">
           <h3 className="text-2xl font-semibold leading-none tracking-tight">Create New Project</h3>
           <p className="text-sm text-muted-foreground">

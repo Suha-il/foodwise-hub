@@ -1,414 +1,235 @@
 
-import { useState, useEffect } from "react";
+import { useState } from "react";
 import Layout from "@/components/layout/Layout";
-import { UserRole, Order, DeliveryStats } from "@/lib/types";
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardFooter,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
-import {
-  BarChart,
-  Bar,
-  PieChart,
-  Pie,
-  Cell,
-  ResponsiveContainer,
-  XAxis,
-  YAxis,
-  Tooltip,
-  Legend,
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+import { 
+  BarChart, Bar, LineChart, Line, XAxis, YAxis, CartesianGrid, Tooltip, Legend, ResponsiveContainer 
 } from "recharts";
-import { Progress } from "@/components/ui/progress";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
-import { Label } from "@/components/ui/label";
-import {
-  Calendar,
-  Filter,
-  Users,
-  Home,
-  Clock,
-  Map,
-  BarChart2,
-  PieChart as PieChartIcon,
-} from "lucide-react";
+import { useIsMobile } from "@/hooks/use-mobile";
+import { Button } from "@/components/ui/button";
+import { Download, RefreshCw } from "lucide-react";
 
-const StatsPage = () => {
-  const [userRole, setUserRole] = useState<UserRole>("user");
-  const [projectName, setProjectName] = useState("Food Delivery");
-  const [orders, setOrders] = useState<Order[]>([]);
-  const [stats, setStats] = useState<DeliveryStats>({
-    totalOrders: 0,
-    pendingOrders: 0,
-    deliveredOrders: 0,
-    totalPeople: 0,
-    pendingPeople: 0,
-  });
-  const [dateFilter, setDateFilter] = useState<string>("all");
-  const [locationFilter, setLocationFilter] = useState<string>("all");
-  
-  // In a real app, fetch this from localStorage or a state management solution
-  useEffect(() => {
-    const storedRole = localStorage.getItem("user_role") as UserRole | null;
-    const storedName = localStorage.getItem("project_name");
-    
-    if (storedRole) {
-      setUserRole(storedRole);
-    }
-    
-    if (storedName) {
-      setProjectName(storedName);
-    }
-    
-    // Generate mock data for houses
-    const areas = ["North", "South", "East", "West", "Central"];
-    
-    // Mock data for demonstration
-    const mockOrders: Order[] = Array.from({ length: 50 }, (_, i) => {
-      const area = areas[i % areas.length];
-      const isDelivered = i % 3 === 0;
-      const numberOfPeople = Math.floor(Math.random() * 5) + 1;
-      const daysAgo = i % 10;
-      const orderDate = new Date();
-      orderDate.setDate(orderDate.getDate() - daysAgo);
-      
-      return {
-        id: `order-${i + 1}`,
-        serialNumber: `SN-${1000 + i}`,
-        date: orderDate.toISOString(),
-        houseNumber: `${area}-${100 + i}`,
-        name: `Customer ${i + 1}`,
-        numberOfPeople,
-        amount: numberOfPeople * (Math.floor(Math.random() * 500) + 500),
-        status: isDelivered ? "delivered" : "pending",
-        projectId: "project-1",
-        createdAt: orderDate.toISOString(),
-        updatedAt: isDelivered ? orderDate.toISOString() : "",
-      };
-    });
-    
-    setOrders(mockOrders);
-    
-    // Calculate statistics
-    const totalOrders = mockOrders.length;
-    const pendingOrders = mockOrders.filter(order => order.status === "pending").length;
-    const deliveredOrders = totalOrders - pendingOrders;
-    const totalPeople = mockOrders.reduce((sum, order) => sum + order.numberOfPeople, 0);
-    const pendingPeople = mockOrders
-      .filter(order => order.status === "pending")
-      .reduce((sum, order) => sum + order.numberOfPeople, 0);
-    
-    setStats({
-      totalOrders,
-      pendingOrders,
-      deliveredOrders,
-      totalPeople,
-      pendingPeople,
-    });
-  }, []);
-  
-  // Apply filters
-  const filteredOrders = orders.filter((order) => {
-    // Date filter
-    if (dateFilter !== "all") {
-      const orderDate = new Date(order.date);
-      const today = new Date();
-      
-      if (dateFilter === "today") {
-        const isToday = orderDate.toDateString() === today.toDateString();
-        if (!isToday) return false;
-      } else if (dateFilter === "yesterday") {
-        const yesterday = new Date();
-        yesterday.setDate(yesterday.getDate() - 1);
-        const isYesterday = orderDate.toDateString() === yesterday.toDateString();
-        if (!isYesterday) return false;
-      } else if (dateFilter === "thisWeek") {
-        const weekStart = new Date();
-        weekStart.setDate(today.getDate() - today.getDay());
-        const isThisWeek = orderDate >= weekStart;
-        if (!isThisWeek) return false;
-      }
-    }
-    
-    // Location filter
-    if (locationFilter !== "all") {
-      const orderLocation = order.houseNumber.split("-")[0];
-      if (orderLocation !== locationFilter) return false;
-    }
-    
-    return true;
-  });
-  
-  // Calculate filtered statistics
-  const filteredStats = {
-    totalOrders: filteredOrders.length,
-    pendingOrders: filteredOrders.filter(order => order.status === "pending").length,
-    deliveredOrders: filteredOrders.filter(order => order.status === "delivered").length,
-    totalPeople: filteredOrders.reduce((sum, order) => sum + order.numberOfPeople, 0),
-    pendingPeople: filteredOrders
-      .filter(order => order.status === "pending")
-      .reduce((sum, order) => sum + order.numberOfPeople, 0),
-  };
-  
-  // Prepare data for charts
-  const statusPieData = [
-    { name: "Pending", value: filteredStats.pendingOrders, color: "#f59e0b" },
-    { name: "Delivered", value: filteredStats.deliveredOrders, color: "#10b981" },
-  ];
-  
-  // Group by location for location distribution
-  const ordersByLocation = filteredOrders.reduce((acc, order) => {
-    const location = order.houseNumber.split("-")[0];
-    if (!acc[location]) {
-      acc[location] = 0;
-    }
-    acc[location]++;
-    return acc;
-  }, {} as Record<string, number>);
-  
-  const locationPieData = Object.entries(ordersByLocation).map(([name, value], index) => ({
-    name,
-    value,
-    color: ["#f97316", "#10b981", "#6366f1", "#ec4899", "#f59e0b"][index % 5],
-  }));
-  
-  // Group by date for trend chart
-  const ordersByDate = filteredOrders.reduce((acc, order) => {
-    const date = new Date(order.date).toLocaleDateString();
-    if (!acc[date]) {
-      acc[date] = { pending: 0, delivered: 0 };
-    }
-    if (order.status === "pending") {
-      acc[date].pending++;
-    } else {
-      acc[date].delivered++;
-    }
-    return acc;
-  }, {} as Record<string, { pending: number; delivered: number }>);
-  
-  const trendChartData = Object.entries(ordersByDate)
-    .map(([date, counts]) => ({ 
-      date, 
-      Pending: counts.pending, 
-      Delivered: counts.delivered 
-    }))
-    .sort((a, b) => new Date(a.date).getTime() - new Date(b.date).getTime())
-    .slice(-7); // Last 7 days
-  
-  // Get unique areas for filter
-  const areas = [...new Set(orders.map(order => order.houseNumber.split("-")[0]))];
+// Sample data for charts
+const monthlyData = [
+  { name: "Jan", orders: 540, revenue: 3200, deliveries: 520 },
+  { name: "Feb", orders: 620, revenue: 4100, deliveries: 600 },
+  { name: "Mar", orders: 700, revenue: 5400, deliveries: 680 },
+  { name: "Apr", orders: 680, revenue: 5200, deliveries: 660 },
+  { name: "May", orders: 790, revenue: 6100, deliveries: 770 },
+  { name: "Jun", orders: 810, revenue: 6500, deliveries: 800 },
+];
 
+const weeklyData = [
+  { name: "Mon", orders: 120, revenue: 950, deliveries: 115 },
+  { name: "Tue", orders: 132, revenue: 1050, deliveries: 130 },
+  { name: "Wed", orders: 141, revenue: 1150, deliveries: 138 },
+  { name: "Thu", orders: 130, revenue: 1000, deliveries: 125 },
+  { name: "Fri", orders: 160, revenue: 1300, deliveries: 155 },
+  { name: "Sat", orders: 170, revenue: 1400, deliveries: 165 },
+  { name: "Sun", orders: 150, revenue: 1200, deliveries: 145 },
+];
+
+interface StatItemProps {
+  title: string;
+  value: string | number;
+  change: number;
+  changePeriod?: string;
+}
+
+const StatItem = ({ title, value, change, changePeriod = "from last period" }: StatItemProps) => {
+  const isPositive = change > 0;
+  const isNeutral = change === 0;
+  
   return (
-    <Layout role={userRole} projectName={projectName}>
-      <div className="space-y-6">
-        <div className="flex justify-between items-center">
-          <h1 className="text-3xl font-bold tracking-tight">Statistics Overview</h1>
-          
-          <div className="flex flex-wrap gap-2">
-            <div className="flex items-center space-x-2">
-              <Calendar className="h-4 w-4 text-muted-foreground" />
-              <Select
-                value={dateFilter}
-                onValueChange={setDateFilter}
-              >
-                <SelectTrigger className="w-[140px] h-9">
-                  <SelectValue placeholder="Filter by date" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Dates</SelectItem>
-                  <SelectItem value="today">Today</SelectItem>
-                  <SelectItem value="yesterday">Yesterday</SelectItem>
-                  <SelectItem value="thisWeek">This Week</SelectItem>
-                </SelectContent>
-              </Select>
-            </div>
-            
-            <div className="flex items-center space-x-2">
-              <Map className="h-4 w-4 text-muted-foreground" />
-              <Select
-                value={locationFilter}
-                onValueChange={setLocationFilter}
-              >
-                <SelectTrigger className="w-[140px] h-9">
-                  <SelectValue placeholder="Filter by location" />
-                </SelectTrigger>
-                <SelectContent>
-                  <SelectItem value="all">All Locations</SelectItem>
-                  {areas.map((area) => (
-                    <SelectItem key={area} value={area}>
-                      {area} Area
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
+    <Card className="bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800">
+      <CardContent className="p-4">
+        <div className="flex flex-col gap-2">
+          <p className="text-sm font-medium text-muted-foreground">{title}</p>
+          <div className="flex items-baseline justify-between">
+            <p className="text-2xl font-bold">{value}</p>
+            <div
+              className={`text-xs font-medium flex items-center ${
+                isPositive
+                  ? "text-green-600 dark:text-green-400"
+                  : isNeutral
+                  ? "text-gray-500 dark:text-gray-400"
+                  : "text-red-600 dark:text-red-400"
+              }`}
+            >
+              <span className="mr-1">
+                {isPositive ? "↑" : isNeutral ? "•" : "↓"}
+              </span>
+              <span>{isPositive ? "+" : ""}{change}%</span>
             </div>
           </div>
+          <p className="text-xs text-muted-foreground">{changePeriod}</p>
         </div>
-        
-        <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
-          <Card className="bg-white">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl flex items-center">
-                <Home className="mr-2 h-5 w-5 text-amber-500" />
-                Pending Houses
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">{filteredStats.pendingOrders}</div>
-              <p className="text-muted-foreground">
-                out of {filteredStats.totalOrders} total houses
-              </p>
-              <div className="mt-2">
-                <Progress 
-                  value={(filteredStats.pendingOrders / Math.max(1, filteredStats.totalOrders)) * 100} 
-                  className="h-2"
-                />
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-white">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl flex items-center">
-                <Users className="mr-2 h-5 w-5 text-primary" />
-                Pending People
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">{filteredStats.pendingPeople}</div>
-              <p className="text-muted-foreground">
-                out of {filteredStats.totalPeople} total people
-              </p>
-              <div className="mt-2">
-                <Progress 
-                  value={(filteredStats.pendingPeople / Math.max(1, filteredStats.totalPeople)) * 100} 
-                  className="h-2"
-                />
-              </div>
-            </CardContent>
-          </Card>
-          
-          <Card className="bg-white">
-            <CardHeader className="pb-2">
-              <CardTitle className="text-xl flex items-center">
-                <Clock className="mr-2 h-5 w-5 text-green-500" />
-                Completion Rate
-              </CardTitle>
-            </CardHeader>
-            <CardContent>
-              <div className="text-3xl font-bold">
-                {filteredStats.totalOrders 
-                  ? Math.round((filteredStats.deliveredOrders / filteredStats.totalOrders) * 100) 
-                  : 0}%
-              </div>
-              <p className="text-muted-foreground">
-                {filteredStats.deliveredOrders} delivered houses
-              </p>
-              <div className="mt-2">
-                <Progress 
-                  value={(filteredStats.deliveredOrders / Math.max(1, filteredStats.totalOrders)) * 100} 
-                  className="h-2 bg-muted"
-                />
-              </div>
-            </CardContent>
-          </Card>
+      </CardContent>
+    </Card>
+  );
+};
+
+const StatsPage = () => {
+  const [timePeriod, setTimePeriod] = useState("monthly");
+  const [isRefreshing, setIsRefreshing] = useState(false);
+  const isMobile = useIsMobile();
+  
+  const data = timePeriod === "monthly" ? monthlyData : weeklyData;
+  
+  const refreshData = () => {
+    setIsRefreshing(true);
+    // Simulate data refresh
+    setTimeout(() => {
+      setIsRefreshing(false);
+    }, 1200);
+  };
+  
+  return (
+    <Layout>
+      <div className="space-y-6">
+        <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+          <h1 className="text-2xl font-bold tracking-tight">Statistics</h1>
+          <div className="flex items-center gap-2">
+            <Button 
+              onClick={refreshData} 
+              variant="outline" 
+              size="sm"
+              disabled={isRefreshing}
+            >
+              <RefreshCw className={`h-4 w-4 mr-2 ${isRefreshing ? "animate-spin" : ""}`} />
+              Refresh
+            </Button>
+            <Button variant="outline" size="sm">
+              <Download className="h-4 w-4 mr-2" />
+              Export
+            </Button>
+          </div>
         </div>
-        
-        <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
-          <Card>
-            <CardHeader className="flex flex-row items-center">
-              <div>
-                <CardTitle>Delivery Status</CardTitle>
-                <CardDescription>
-                  Distribution of pending vs. delivered orders
-                </CardDescription>
-              </div>
-              <PieChartIcon className="ml-auto h-5 w-5 text-muted-foreground" />
-            </CardHeader>
-            <CardContent className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <PieChart>
-                  <Pie
-                    data={statusPieData}
-                    cx="50%"
-                    cy="50%"
-                    labelLine={false}
-                    label={({ name, percent }) => `${name}: ${(percent * 100).toFixed(0)}%`}
-                    outerRadius={80}
-                    fill="#8884d8"
-                    dataKey="value"
-                  >
-                    {statusPieData.map((entry, index) => (
-                      <Cell key={`cell-${index}`} fill={entry.color} />
-                    ))}
-                  </Pie>
-                  <Tooltip formatter={(value) => [value, "Orders"]} />
-                  <Legend />
-                </PieChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
-          
-          <Card>
-            <CardHeader className="flex flex-row items-center">
-              <div>
-                <CardTitle>Delivery Trend</CardTitle>
-                <CardDescription>
-                  Order delivery status over time
-                </CardDescription>
-              </div>
-              <BarChart2 className="ml-auto h-5 w-5 text-muted-foreground" />
-            </CardHeader>
-            <CardContent className="h-80">
-              <ResponsiveContainer width="100%" height="100%">
-                <BarChart data={trendChartData} margin={{ top: 20, right: 30, left: 20, bottom: 5 }}>
-                  <XAxis dataKey="date" />
-                  <YAxis />
-                  <Tooltip />
-                  <Legend />
-                  <Bar dataKey="Delivered" fill="#10b981" />
-                  <Bar dataKey="Pending" fill="#f59e0b" />
-                </BarChart>
-              </ResponsiveContainer>
-            </CardContent>
-          </Card>
+
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-4">
+          <StatItem
+            title="Total Orders"
+            value="4,612"
+            change={12.5}
+          />
+          <StatItem
+            title="Completed Deliveries"
+            value="4,480"
+            change={10.2}
+          />
+          <StatItem
+            title="Total Revenue"
+            value="$32,840"
+            change={8.1}
+          />
+          <StatItem
+            title="Average Delivery Time"
+            value="32 mins"
+            change={-5.3}
+          />
         </div>
-        
-        <Card>
-          <CardHeader>
-            <CardTitle>Orders by Location</CardTitle>
-            <CardDescription>
-              Distribution of orders across different areas
-            </CardDescription>
-          </CardHeader>
-          <CardContent className="h-80">
-            <ResponsiveContainer width="100%" height="100%">
-              <BarChart
-                data={locationPieData}
-                layout="vertical"
-                margin={{ top: 20, right: 30, left: 60, bottom: 5 }}
+
+        <Tabs defaultValue="orders" className="w-full">
+          <div className="flex justify-between items-center mb-4">
+            <TabsList className="bg-gray-100 dark:bg-gray-800">
+              <TabsTrigger value="orders">Orders</TabsTrigger>
+              <TabsTrigger value="revenue">Revenue</TabsTrigger>
+              <TabsTrigger value="deliveries">Deliveries</TabsTrigger>
+            </TabsList>
+            
+            <div className="bg-gray-100 dark:bg-gray-800 rounded-md p-1">
+              <Button
+                variant={timePeriod === "weekly" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setTimePeriod("weekly")}
+                className="text-xs h-7 px-2"
               >
-                <XAxis type="number" />
-                <YAxis dataKey="name" type="category" />
-                <Tooltip formatter={(value) => [value, "Orders"]} />
-                <Bar dataKey="value" name="Orders">
-                  {locationPieData.map((entry, index) => (
-                    <Cell key={`cell-${index}`} fill={entry.color} />
-                  ))}
-                </Bar>
-              </BarChart>
-            </ResponsiveContainer>
-          </CardContent>
-        </Card>
+                Weekly
+              </Button>
+              <Button
+                variant={timePeriod === "monthly" ? "default" : "ghost"}
+                size="sm"
+                onClick={() => setTimePeriod("monthly")}
+                className="text-xs h-7 px-2"
+              >
+                Monthly
+              </Button>
+            </div>
+          </div>
+          
+          <div className="p-4 border rounded-lg bg-white dark:bg-gray-900 border-gray-200 dark:border-gray-800">
+            <TabsContent value="orders" className="mt-0">
+              <CardHeader className="px-0 pt-0">
+                <CardTitle>Order Statistics</CardTitle>
+                <CardDescription>
+                  Number of orders {timePeriod === "monthly" ? "per month" : "per day"}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="px-0 pb-0">
+                <ResponsiveContainer width="100%" height={isMobile ? 200 : 300}>
+                  <BarChart data={data}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip contentStyle={{ background: 'white', border: '1px solid #ccc' }} />
+                    <Legend />
+                    <Bar dataKey="orders" fill="#8884d8" name="Orders" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </TabsContent>
+            
+            <TabsContent value="revenue" className="mt-0">
+              <CardHeader className="px-0 pt-0">
+                <CardTitle>Revenue Statistics</CardTitle>
+                <CardDescription>
+                  Total revenue {timePeriod === "monthly" ? "per month" : "per day"} (USD)
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="px-0 pb-0">
+                <ResponsiveContainer width="100%" height={isMobile ? 200 : 300}>
+                  <LineChart data={data}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip contentStyle={{ background: 'white', border: '1px solid #ccc' }} />
+                    <Legend />
+                    <Line 
+                      type="monotone" 
+                      dataKey="revenue" 
+                      stroke="#82ca9d" 
+                      name="Revenue" 
+                      strokeWidth={2}
+                      dot={{ r: 4 }}
+                    />
+                  </LineChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </TabsContent>
+            
+            <TabsContent value="deliveries" className="mt-0">
+              <CardHeader className="px-0 pt-0">
+                <CardTitle>Delivery Statistics</CardTitle>
+                <CardDescription>
+                  Number of completed deliveries {timePeriod === "monthly" ? "per month" : "per day"}
+                </CardDescription>
+              </CardHeader>
+              <CardContent className="px-0 pb-0">
+                <ResponsiveContainer width="100%" height={isMobile ? 200 : 300}>
+                  <BarChart data={data}>
+                    <CartesianGrid strokeDasharray="3 3" vertical={false} />
+                    <XAxis dataKey="name" />
+                    <YAxis />
+                    <Tooltip contentStyle={{ background: 'white', border: '1px solid #ccc' }} />
+                    <Legend />
+                    <Bar dataKey="deliveries" fill="#ffc658" name="Deliveries" />
+                  </BarChart>
+                </ResponsiveContainer>
+              </CardContent>
+            </TabsContent>
+          </div>
+        </Tabs>
       </div>
     </Layout>
   );

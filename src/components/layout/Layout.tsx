@@ -90,7 +90,7 @@ export default function Layout({ children, role = "user", projectName = "Food De
   );
 
   return (
-    <div className={cn("min-h-screen bg-background flex", isMounted ? "opacity-100" : "opacity-0")}>
+    <div className={cn("min-h-screen bg-gray-50 dark:bg-gray-950 flex", isMounted ? "opacity-100" : "opacity-0")}>
       {/* Sidebar - Updated with solid background */}
       <aside
         className={cn(
@@ -157,7 +157,7 @@ export default function Layout({ children, role = "user", projectName = "Food De
       {/* Mobile sidebar backdrop */}
       {isSidebarOpen && (
         <div
-          className="fixed inset-0 z-40 bg-black/50 backdrop-blur-sm lg:hidden"
+          className="fixed inset-0 z-40 bg-black/50 lg:hidden"
           onClick={() => setIsSidebarOpen(false)}
         />
       )}

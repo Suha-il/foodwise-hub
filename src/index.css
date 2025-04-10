@@ -65,9 +65,9 @@
 }
 
 @layer components {
-  /* Updated glass-card to be less transparent and more readable */
+  /* Updated glass-card to be solid and more readable */
   .glass-card {
-    @apply bg-white/90 dark:bg-gray-900/90 backdrop-blur-md border border-white/30 dark:border-gray-800/50 shadow-md rounded-xl;
+    @apply bg-white dark:bg-gray-900 border border-gray-200 dark:border-gray-800 shadow-md rounded-xl;
   }
   
   .neo-card {
@@ -94,7 +94,7 @@
     @apply transition-all duration-200 focus:ring-2 focus:ring-primary/50 focus:border-primary/80;
   }
 
-  /* Updated stat-card to be less transparent */
+  /* Updated stat-card to be solid */
   .stat-card {
     @apply bg-white dark:bg-gray-900 p-3 sm:p-4 hover:shadow-md transition-all duration-300 hover:-translate-y-1 rounded-xl border border-gray-200 dark:border-gray-800;
   }

@@ -12,7 +12,7 @@ export default function ProjectSetup({ onBack, onComplete }: ProjectSetupProps) 
   
   return (
     <div className={`mx-auto w-full max-w-md ${isMobile ? "px-4" : ""}`}>
-      <div className="animate-fade-in bg-white dark:bg-gray-900 rounded-xl shadow-md p-5">
+      <div className="animate-fade-in bg-white dark:bg-gray-900 rounded-xl shadow-md p-5 border border-gray-200 dark:border-gray-800">
         <ProjectSetupForm onBack={onBack} onComplete={onComplete} />
       </div>
     </div>

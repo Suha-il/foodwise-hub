@@ -1,2 +1,167 @@
 
-/* Removing App.css in favor of using Tailwind classes with solid backgrounds */
+/* Premium Food Delivery App Styles */
+
+/* Premium gold text gradients */
+.gold-text {
+  @apply text-transparent bg-clip-text bg-gradient-to-r from-gold to-gold-dark;
+}
+
+/* Elegant shadows for premium cards */
+.premium-shadow {
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1),
+              0 4px 10px -5px rgba(212, 175, 55, 0.15);
+}
+
+/* Gold accent borders */
+.gold-border {
+  border: 1px solid;
+  border-image: linear-gradient(45deg, #d4af37, #f5d787, #d4af37) 1;
+}
+
+/* Royal blue accent */
+.royal-accent {
+  background: linear-gradient(45deg, #1e3a8a, #4a6fa5);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+}
+
+/* Premium hover effects */
+.premium-hover {
+  transition: all 0.3s ease;
+}
+
+.premium-hover:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 15px 30px -5px rgba(0, 0, 0, 0.1),
+              0 8px 10px -5px rgba(212, 175, 55, 0.2);
+}
+
+/* Luxury card styling */
+.luxury-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  position: relative;
+}
+
+.luxury-card::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: linear-gradient(90deg, #d4af37, #f5d787, #d4af37);
+  background-size: 200% 100%;
+  animation: gradient-shift 3s ease infinite;
+}
+
+/* Gold button */
+.gold-button {
+  background: linear-gradient(45deg, #d4af37, #f5d787, #d4af37);
+  background-size: 200% 100%;
+  transition: all 0.3s ease;
+  color: #000;
+  font-weight: 500;
+  border: none;
+  position: relative;
+  z-index: 1;
+  overflow: hidden;
+}
+
+.gold-button::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: -100%;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, #f5d787, #d4af37);
+  transition: all 0.3s ease;
+  z-index: -1;
+}
+
+.gold-button:hover::before {
+  left: 0;
+}
+
+.gold-button:hover {
+  box-shadow: 0 5px 15px rgba(212, 175, 55, 0.3);
+}
+
+/* Royal blue button */
+.royal-button {
+  background: linear-gradient(45deg, #1e3a8a, #4a6fa5);
+  color: white;
+  transition: all 0.3s ease;
+}
+
+.royal-button:hover {
+  background: linear-gradient(45deg, #15295f, #3a5a89);
+  box-shadow: 0 5px 15px rgba(30, 58, 138, 0.3);
+}
+
+/* Subtle animation for background elements */
+@keyframes gradient-shift {
+  0% {
+    background-position: 0% 50%;
+  }
+  50% {
+    background-position: 100% 50%;
+  }
+  100% {
+    background-position: 0% 50%;
+  }
+}
+
+.gradient-bg {
+  background: linear-gradient(45deg, #d4af37, #f5d787, #d4af37);
+  background-size: 200% 100%;
+  animation: gradient-shift 3s ease infinite;
+}
+
+/* Premium image container */
+.premium-image {
+  position: relative;
+  overflow: hidden;
+  border-radius: 12px;
+}
+
+.premium-image::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  background: linear-gradient(45deg, rgba(212, 175, 55, 0.2), transparent);
+}
+
+/* Premium text styling */
+.premium-title {
+  font-family: 'Playfair Display', serif;
+  font-weight: 700;
+  letter-spacing: -0.02em;
+}
+
+.premium-subtitle {
+  font-family: 'Cormorant Garamond', serif;
+  font-weight: 500;
+  letter-spacing: 0.02em;
+}
+
+/* Premium card styling */
+.premium-card {
+  background: white;
+  border-radius: 12px;
+  overflow: hidden;
+  transition: all 0.3s ease;
+  box-shadow: 0 10px 30px -5px rgba(0, 0, 0, 0.1);
+}
+
+.premium-card:hover {
+  transform: translateY(-5px);
+  box-shadow: 0 15px 40px -5px rgba(0, 0, 0, 0.15),
+              0 5px 20px -5px rgba(212, 175, 55, 0.2);
+}

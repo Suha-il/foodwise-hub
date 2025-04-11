@@ -1,3 +1,4 @@
+
 import type { Config } from "tailwindcss";
 
 export default {
@@ -24,7 +25,8 @@ export default {
 			},
 			fontFamily: {
 				sans: ['Inter', 'sans-serif'],
-				display: ['SF Pro Display', 'Inter', 'sans-serif'],
+				display: ['Playfair Display', 'serif'],
+				serif: ['Cormorant Garamond', 'serif'],
 			},
 			fontSize: {
 				'xs': ['0.75rem', { lineHeight: '1rem' }],
@@ -78,6 +80,16 @@ export default {
 					'accent-foreground': 'hsl(var(--sidebar-accent-foreground))',
 					border: 'hsl(var(--sidebar-border))',
 					ring: 'hsl(var(--sidebar-ring))'
+				},
+				gold: {
+					light: '#f5d787',
+					DEFAULT: '#d4af37',
+					dark: '#aa8c2c'
+				},
+				royal: {
+					light: '#4a6fa5',
+					DEFAULT: '#1e3a8a',
+					dark: '#172554'
 				}
 			},
 			borderRadius: {
@@ -128,6 +140,20 @@ export default {
 				},
 				shimmer: {
 					'100%': { transform: 'translateX(100%)' }
+				},
+				'gold-shine': {
+					'0%': { 
+						backgroundPosition: '0% 50%',
+						boxShadow: '0 0 5px rgba(212, 175, 55, 0.5)'
+					},
+					'50%': { 
+						backgroundPosition: '100% 50%',
+						boxShadow: '0 0 20px rgba(212, 175, 55, 0.8)'
+					},
+					'100%': { 
+						backgroundPosition: '0% 50%',
+						boxShadow: '0 0 5px rgba(212, 175, 55, 0.5)' 
+					}
 				}
 			},
 			animation: {
@@ -141,7 +167,8 @@ export default {
 				'slide-in-left': 'slide-in-left 0.3s ease-out',
 				'float': 'float 3s ease-in-out infinite',
 				'pulse': 'pulse 2s ease-in-out infinite',
-				'shimmer': 'shimmer 2s infinite linear'
+				'shimmer': 'shimmer 2s infinite linear',
+				'gold-shine': 'gold-shine 3s infinite ease-in-out'
 			},
 			boxShadow: {
 				'glass': '0 4px 30px rgba(0, 0, 0, 0.1)',
@@ -149,13 +176,18 @@ export default {
 				'neo': '5px 5px 10px #d1d1d1, -5px -5px 10px #ffffff',
 				'inner-neo': 'inset 3px 3px 6px #d1d1d1, inset -3px -3px 6px #ffffff',
 				'highlight': '0 0 15px rgba(59, 130, 246, 0.5)',
-				'card-hover': '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)'
+				'card-hover': '0 10px 25px -5px rgba(0, 0, 0, 0.1), 0 8px 10px -6px rgba(0, 0, 0, 0.1)',
+				'premium': '0 10px 25px -5px rgba(212, 175, 55, 0.15), 0 8px 10px -6px rgba(212, 175, 55, 0.1)',
+				'royal': '0 10px 25px -5px rgba(30, 58, 138, 0.15), 0 8px 10px -6px rgba(30, 58, 138, 0.1)'
 			},
 			backgroundImage: {
 				'gradient-radial': 'radial-gradient(var(--tw-gradient-stops))',
 				'glass': 'linear-gradient(135deg, rgba(255, 255, 255, 0.4), rgba(255, 255, 255, 0.2))',
 				'glass-dark': 'linear-gradient(135deg, rgba(40, 40, 40, 0.4), rgba(20, 20, 20, 0.2))',
-				'gradient-shimmer': 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent)'
+				'gradient-shimmer': 'linear-gradient(90deg, transparent, rgba(255, 255, 255, 0.1), transparent)',
+				'gold-gradient': 'linear-gradient(45deg, #d4af37, #f5d787, #d4af37)',
+				'royal-gradient': 'linear-gradient(45deg, #1e3a8a, #4a6fa5, #1e3a8a)',
+				'premium-gradient': 'linear-gradient(to right, #000000, #434343)'
 			},
 			spacing: {
 				'safe-bottom': 'env(safe-area-inset-bottom)',

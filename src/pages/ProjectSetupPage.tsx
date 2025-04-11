@@ -6,7 +6,7 @@ import SupabaseProjectSetupForm from "@/components/supabase/SupabaseProjectSetup
 import ProjectSetupForm from "@/components/auth/ProjectSetupForm";
 import { Button } from "@/components/ui/button";
 import { motion } from "framer-motion";
-import { ArrowLeft, ArrowRight } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check } from "lucide-react";
 import { showToast } from "@/components/ui/toast-container";
 
 enum SetupStep {

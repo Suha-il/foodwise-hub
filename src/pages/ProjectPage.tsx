@@ -1,7 +1,7 @@
 
 import { useState } from "react";
 import Layout from "@/components/layout/Layout";
-import { UserRole } from "@/lib/types";
+import { UserRole, ProjectSummary } from "@/lib/types";
 import { Card, CardContent, CardDescription, CardFooter, CardHeader, CardTitle } from "@/components/ui/card";
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 import { Button } from "@/components/ui/button";
@@ -12,6 +12,30 @@ export default function ProjectPage() {
   const [role] = useState<UserRole>("main_admin");
   const [projectName] = useState("Downtown Food Delivery");
   const isMobile = useIsMobile();
+  
+  // Create a mock projectSummary that matches the expected ProjectSummary type
+  const projectSummary: ProjectSummary = {
+    project: {
+      id: "project-1",
+      name: projectName,
+      code: "ABC123",
+      ownerId: "user-1",
+      createdAt: new Date("2025-01-15").toISOString(),
+      lastActive: new Date().toISOString(),
+    },
+    stats: {
+      totalOrders: 1250,
+      pendingDeliveries: 24,
+      totalIncome: 125000,
+      totalExpenditure: 45000,
+      balance: 80000
+    }
+  };
+
+  // Mock function for the onBack prop
+  const handleBack = () => {
+    console.log("Back button clicked");
+  };
 
   return (
     <Layout role={role} projectName={projectName}>
@@ -38,14 +62,9 @@ export default function ProjectPage() {
               </CardHeader>
               <CardContent>
                 <ProjectOverview 
-                  name={projectName}
-                  code="ABC123"
-                  createdAt={new Date("2025-01-15").toISOString()}
-                  stats={{
-                    activeOrders: 24,
-                    totalOrders: 1250,
-                    dailyAverage: 42
-                  }}
+                  projectSummary={projectSummary}
+                  onBack={handleBack}
+                  userRole={role}
                 />
               </CardContent>
             </Card>

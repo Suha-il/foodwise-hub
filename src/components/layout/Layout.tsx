@@ -1,6 +1,6 @@
 
 import { ReactNode, useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
+import { Link, useLocation, useNavigate } from "react-router-dom";
 import {
   Home,
   ClipboardList,
@@ -15,6 +15,7 @@ import {
 import { cn } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { UserRole } from "@/lib/types";
+import { useAuth } from "@/contexts/AuthContext";
 
 interface LayoutProps {
   children: ReactNode;
@@ -70,6 +71,8 @@ const navItems: NavItem[] = [
 
 export default function Layout({ children, role = "user", projectName = "Food Delivery" }: LayoutProps) {
   const location = useLocation();
+  const navigate = useNavigate();
+  const { user, logout } = useAuth();
   const [isSidebarOpen, setIsSidebarOpen] = useState(false);
   const [isMounted, setIsMounted] = useState(false);
   
@@ -88,6 +91,11 @@ export default function Layout({ children, role = "user", projectName = "Food De
   const filteredNavItems = navItems.filter((item) =>
     item.allowedRoles.includes(role)
   );
+
+  const handleLogout = async () => {
+    await logout();
+    navigate("/auth");
+  };
 
   return (
     <div className={cn("min-h-screen bg-gray-50 dark:bg-gray-950 flex", isMounted ? "opacity-100" : "opacity-0")}>
@@ -142,9 +150,12 @@ export default function Layout({ children, role = "user", projectName = "Food De
               </div>
               <div className="ml-2 sm:ml-3">
                 <p className="text-xs sm:text-sm font-medium text-gray-900 dark:text-gray-100 capitalize">
-                  {role.replace("_", " ")}
+                  {user?.name || role.replace("_", " ")}
                 </p>
-                <button className="text-xs text-gray-700 dark:text-gray-300 flex items-center hover:text-primary">
+                <button 
+                  className="text-xs text-gray-700 dark:text-gray-300 flex items-center hover:text-primary"
+                  onClick={handleLogout}
+                >
                   <LogOut className="mr-1 h-3 w-3" />
                   Sign out
                 </button>

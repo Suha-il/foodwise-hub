@@ -3,15 +3,17 @@ import { Toaster } from "@/components/ui/toaster";
 import { Toaster as Sonner } from "@/components/ui/sonner";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, Navigate } from "react-router-dom";
 import { lazy, Suspense } from "react";
 import { motion, AnimatePresence } from "framer-motion";
 import { ToastContainer } from "@/components/ui/toast-container";
 import { ErrorBoundary } from "@/components/error/ErrorBoundary";
+import { AuthProvider, useAuth } from "@/contexts/AuthContext";
 
 // Pages
 import Index from "./pages/Index";
 import NotFound from "./pages/NotFound";
+import AuthPage from "./pages/AuthPage";
 
 // Lazy-loaded pages for better performance
 const OrderPage = lazy(() => import("./pages/OrderPage"));
@@ -19,6 +21,7 @@ const DeliveryPage = lazy(() => import("./pages/DeliveryPage"));
 const FinancePage = lazy(() => import("./pages/FinancePage"));
 const StatsPage = lazy(() => import("./pages/StatsPage"));
 const ProjectPage = lazy(() => import("./pages/ProjectPage"));
+const ProjectSetupPage = lazy(() => import("./pages/ProjectSetupPage"));
 
 const LoadingFallback = () => (
   <div className="min-h-screen flex flex-col items-center justify-center p-4">
@@ -35,6 +38,21 @@ const LoadingFallback = () => (
   </div>
 );
 
+// Protected route component
+const ProtectedRoute = ({ children }: { children: React.ReactNode }) => {
+  const { isAuthenticated, isLoading } = useAuth();
+  
+  if (isLoading) {
+    return <LoadingFallback />;
+  }
+  
+  if (!isAuthenticated) {
+    return <Navigate to="/auth" replace />;
+  }
+  
+  return <>{children}</>;
+};
+
 const queryClient = new QueryClient({
   defaultOptions: {
     queries: {
@@ -44,29 +62,79 @@ const queryClient = new QueryClient({
   },
 });
 
+const AppRoutes = () => (
+  <AnimatePresence mode="wait">
+    <Suspense fallback={<LoadingFallback />}>
+      <Routes>
+        <Route 
+          path="/" 
+          element={
+            <ProtectedRoute>
+              <Index />
+            </ProtectedRoute>
+          } 
+        />
+        <Route path="/auth" element={<AuthPage />} />
+        <Route path="/project-setup" element={<ProjectSetupPage />} />
+        <Route 
+          path="/orders" 
+          element={
+            <ProtectedRoute>
+              <OrderPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/delivery" 
+          element={
+            <ProtectedRoute>
+              <DeliveryPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/finance" 
+          element={
+            <ProtectedRoute>
+              <FinancePage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/stats" 
+          element={
+            <ProtectedRoute>
+              <StatsPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route 
+          path="/project" 
+          element={
+            <ProtectedRoute>
+              <ProjectPage />
+            </ProtectedRoute>
+          } 
+        />
+        <Route path="*" element={<NotFound />} />
+      </Routes>
+    </Suspense>
+  </AnimatePresence>
+);
+
 const App = () => (
   <ErrorBoundary>
     <QueryClientProvider client={queryClient}>
-      <TooltipProvider>
-        <Toaster />
-        <Sonner />
-        <ToastContainer />
-        <BrowserRouter>
-          <AnimatePresence mode="wait">
-            <Suspense fallback={<LoadingFallback />}>
-              <Routes>
-                <Route path="/" element={<Index />} />
-                <Route path="/orders" element={<OrderPage />} />
-                <Route path="/delivery" element={<DeliveryPage />} />
-                <Route path="/finance" element={<FinancePage />} />
-                <Route path="/stats" element={<StatsPage />} />
-                <Route path="/project" element={<ProjectPage />} />
-                <Route path="*" element={<NotFound />} />
-              </Routes>
-            </Suspense>
-          </AnimatePresence>
-        </BrowserRouter>
-      </TooltipProvider>
+      <AuthProvider>
+        <TooltipProvider>
+          <Toaster />
+          <Sonner />
+          <ToastContainer />
+          <BrowserRouter>
+            <AppRoutes />
+          </BrowserRouter>
+        </TooltipProvider>
+      </AuthProvider>
     </QueryClientProvider>
   </ErrorBoundary>
 );
